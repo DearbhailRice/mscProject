@@ -1,25 +1,19 @@
 const mysql = require('mysql');
- //const conn = mariadb.createConnection({
-//     host: process.env.DB_HOST,
-//     user: process.env.DB_USER,
-//     database: process.env.DB_DATABASE,
-//     password: process.env.DB_PASS,
-// });
 
- const conn = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    database: 'bnel_db',
-    password: 'bnelpass1221',
- 
+const conn = mysql.createConnection({
+  host: '8889',
+  user: 'root',
+  password: 'root',
+  database: 'msc_project',
+  socketPath: '/Applications/MAMP/tmp/mysql/mysql.sock'
 });
 
 conn.connect(err => {
-    if (err) {
-      console.log("not connected due to error: " + err);
-    } else {
-      console.log("connected ! connection id is " + conn.threadId);
-    }
-  });
-  
+  if (err) {
+    console.log("not connected due to error: " + err);
+  } else {
+    console.log("connected ! connection id is " + conn.threadId);
+  }
+});
+
 module.exports = conn;
