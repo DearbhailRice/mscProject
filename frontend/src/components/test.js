@@ -9,23 +9,27 @@ export default class Test extends Component {
     }
 
     componentDidMount() {
-        let testArray = [];
-        fetch("http://localhost:3001/tests")
-            .then(res => res.json())
-            .then(dbres => {
-                testArray = dbres.map(item => {
-                    return {
-                        testId: item.test_id,
-                        firstName: item.first_name,
-                        secondName: item.second_name
-                    };
-                });
-                console.log("test array " + JSON.stringify(testArray, null, 4));
+        // let testArray = [];
+        // fetch("http://localhost:3001/test_select_all")
+        //     .then(res => res.json())
+        //     .then(dbres => {
+        //         testArray = dbres.map(item => {
+        //             return {
+        //                 testId: item.test_id,
+        //                 firstName: item.first_name,
+        //                 secondName: item.second_name
+        //             };
+        //         });
+        //         console.log("test array " + JSON.stringify(testArray, null, 4));
 
-            });
-        this.setState({
-            testArrayState: testArray
-        });
+        //     });
+        // this.setState({
+        //     testArrayState: testArray
+        // });
+
+        // fetch("http://localhost:3001/test_insert");
+        //fetch("http://localhost:3001/test_update");
+        fetch("http://localhost:3001/test_delete");
 
     }
     render() {

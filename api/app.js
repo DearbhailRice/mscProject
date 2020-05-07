@@ -28,10 +28,51 @@ app.use('/users', usersRouter);
 app.use("/testAPI", testAPIRouter);
 app.use("/test", testdbRouter);
 
-app.route("/tests").get(function (req, res) {
-  console.log("in tests router api");
+// app.route("/test_select_all").get(function (req, res) {
+//   console.log("in test_select_all router api");
+//   connection.query(
+//     "SELECT * FROM test_table",
+//     req.params.test_id,
+//     function (error, results, feilds) {
+//       if (error) throw error;
+//       res.json(results);
+//     }
+//   );
+// });
+
+// app.route("/test_insert").get(function (req, res) {
+//   console.log("in test_insert router api");
+//   connection.query(
+//     "INSERT INTO `msc_project`.`test_table` ( `first_name`, `second_name`) VALUES ('first name 4', 'second name 4');",
+//     req.params.test_id,
+//     function (error, results, feilds) {
+//       if (error) throw error;
+//       res.json(results);
+//     }
+//   );
+// });
+
+// app.route("/test_update").get(function (req, res) {
+//   var paramUpdateFname = "'updated first name' ";
+//   var paramUpdateLname = "'updated second name' ";
+//   var paramTestId = 4;
+//   console.log("in test_update router api");
+//   connection.query(
+//     "UPDATE `msc_project`.`test_table` SET `first_name` = " + paramUpdateFname + ", `second_name` = " + paramUpdateLname + " WHERE`test_table`.`test_id` =" + paramTestId + "; ",
+//     req.params.test_id,
+//     function (error, results, feilds) {
+//       if (error) throw error;
+//       res.json(results);
+//     }
+//   );
+// });
+
+
+app.route("/test_delete").get(function (req, res) {
+  var paramTestId = 5;
+  console.log("in test_update router api");
   connection.query(
-    "SELECT * FROM test_table",
+    "DELETE FROM `msc_project`.`test_table` WHERE `test_table`.`test_id` = " + paramTestId + "; ",
     req.params.test_id,
     function (error, results, feilds) {
       if (error) throw error;
@@ -39,8 +80,7 @@ app.route("/tests").get(function (req, res) {
     }
   );
 });
-
-
+//
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
