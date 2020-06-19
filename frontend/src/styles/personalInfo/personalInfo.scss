@@ -1,0 +1,18 @@
+.tableWrapper{
+    padding: 5%;
+    display: inline-flex;
+}
+.element{
+    // border: thin solid black;
+}
+.title{
+     width: 30%;
+    border: thin solid green($color: hsl(199, 94%, 57%));
+}
+.data{
+  flex: auto;
+   float: right;
+
+    width: 65%;
+   border: thin solid green($color: hsl(310, 94%, 57%));
+}
