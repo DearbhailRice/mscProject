@@ -1,10 +1,9 @@
 import React from 'react';
 import { Switch, Route } from "react-router-dom";
-//import logo from './logo.svg';
-//import './App.css';
 import test from './components/test';
-
-
+import learningProfile from './components/learning-profile';
+import personalProfile from './components/personal-profile';
+import login from './components/login';
 function App() {
 
   return (
@@ -12,8 +11,12 @@ function App() {
       {console.log("in app div")}
       <Switch>
         {console.log("in switch")}
-        {/* <Route path="/" component={<div> </div>} /> */}
+
         <Route exact path="/test" component={test} />
+        <Route exact path="/login" component={login} />
+        <Route exact path="/learning-profile" component={learningProfile} />
+        <Route exact path="/personal-profile" component={personalProfile} />
+
       </Switch>
     </div>
 

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Navbar from "../components/navbar/index"
 import Table from "../components/table/index";
 
 
@@ -43,13 +44,13 @@ export default class Test extends Component {
             }).catch(err => {
                 alert(err);
             })
-
     }
     render() {
         return (
             <div className="test">
+
                 {console.log("on test page ")}
-                <p>Test page </p>
+                <Navbar />
                 <p>{this.state.testArrayState}</p>
                 {console.log("rowData test page" + JSON.stringify(this.state.rowData))}
                 <Table {...this.state} navigateRow={this.redirect.bind(this)} />
