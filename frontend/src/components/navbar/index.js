@@ -3,8 +3,7 @@ import { Route } from "react-router-dom";
 import "../../styles/navbar/navbar.scss";
 import Logo from "../../images/NHSCT.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faSignInAlt, faGraduationCap } from "@fortawesome/free-solid-svg-icons"
-
+import { faUser, faSignInAlt, faGraduationCap } from "@fortawesome/free-solid-svg-icons";
 
 export default class Navbar extends Component {
     constructor(props) {

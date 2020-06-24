@@ -7,8 +7,6 @@ export default class formUser extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isGoing: true,
-            numberOfGuests: 2
         };
 
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -33,39 +31,72 @@ export default class formUser extends Component {
             <div className="formComponenet">
 
                 <div className="formDiv">
+                    <fieldset className="fieldset">
 
-                    <form onSubmit={this.handleSubmit}>
-                        <div className="formElement">
-                            <label>
-                                Name:
-                    <input type="text" value={this.state.value} onChange={this.handleChange} />
-                            </label>
-                        </div>
-                        <div className="formElement">
-                            <label>
-                                Is going:
-                             <input
-                                    name="isGoing"
-                                    type="checkbox"
-                                    checked={this.state.isGoing}
-                                    onChange={this.handleInputChange} />
-                            </label>
-                        </div>
+                        <form onSubmit={this.handleSubmit}>
+                            <h2 className="title">{this.props.componentTitle}</h2>
+                            {this.props.formElementLable.map((label, index) => {
+                                return <div className="formElement">
+                                    <label className="formLabel" key={index}>
+                                        {label}:
 
-                        <div className="formElement">
-                            <label>
-                                Number of guests:
-                              <input
-                                    name="numberOfGuests"
-                                    type="number"
-                                    value={this.state.numberOfGuests}
-                                    onChange={this.handleInputChange} />
-                            </label>
-                        </div>
-                        <div className="formElement">
-                            <input type="submit" value="Submit" />
-                        </div>
-                    </form>
+                                    {this.props.inputType.map((typeOfInput, indexType) => {
+                                            var inputValue;
+
+                                            if (indexType === index) {
+
+                                                switch (typeOfInput) {
+                                                    case "checkbox": inputValue = 1;
+                                                        break;
+                                                    case "option": inputValue = "option";
+                                                        break;
+                                                    case "text":
+
+                                                    case "email":
+
+                                                    case "date":
+
+                                                    case "tel":
+                                                        // if (this.props.rowData.length > 0) {
+                                                        //     inputValue = this.props.rowData.map(dataInRow => {
+                                                        //         return dataInRow[index];
+                                                        //     })
+                                                        // } else {
+                                                        inputValue = typeOfInput;
+                                                        // }
+                                                        break;
+                                                    default: inputValue = typeOfInput;
+                                                }
+
+                                                // if (typeOfInput == "option") {
+                                                //     console.log("options" + JSON.stringify(this.props.options))
+
+                                                //     {
+                                                //         this.props.options.map((optionData, indexOption) => {
+                                                //             console.log("optional Data " + optionData);
+
+                                                //             return <select > <option key={indexOption} value={indexOption.role_id}>{JSON.stringify(indexOption)}</option> </select>
+                                                //         })
+
+                                                //         return
+                                                //     }
+
+                                                // }
+                                                return <input className="formInput" type={typeOfInput} defaultValue={inputValue} /> //onChange={this.handleChange}  value={inputValue}
+                                            }
+
+                                        })
+                                        }
+                                    </label>
+                                </div>
+                            })}
+
+                            <div className="formElement">
+                                <input className="formButton" type="submit" value="Save" />
+                                <input className="formButton" type="reset" value="Reset" />
+                            </div>
+                        </form>
+                    </fieldset>
                 </div>
 
             </div>

@@ -11,6 +11,8 @@ var testAPIRouter = require("./routes/testAPI");
 var cors = require("cors");
 var app = express();
 var testdbRouter = require("./routes/test")
+var personalProfileRouter = require("./routes/personalProfile")
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -27,6 +29,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use("/testAPI", testAPIRouter);
 app.use("/test", testdbRouter);
+//app.use("/personal_profile_select:userId", personalProfileRouter);
 
 app.route("/test_select_all").get(function (req, res) {
   console.log("in test_select_all router api");
@@ -94,13 +97,58 @@ app.route("/learning-profile-select").get(function (req, res) {
 // });
 
 
-app.route("/personal_profile_select").get(function (req, res) {
-  console.log("in test_update router api");
+app.route("/personal_profile_select:userId").get(function (req, res) {
+  var userId = req.params.userId;
+  console.log("in personal_profile_select router api");
   connection.query(
-    "SELECT user_id, user_name, user_email_address,user_start_date, user_bank_staff_number,user_current_trust_employee_in_current_role,contact_details_tel_number, contact_details_personal_email,  contact_details_preffer_personal_email_contact, address_line_1, address_line_2, address_line_3,  address_postcode,address_town, address_county, emergency_contact_details_name, emergency_contact_details_tel_number, emergency_contact_details__relationship,clinical_area_title,role_title,band_title FROM user INNER Join contact_details on user.user_id = contact_details.contact_details_user_id INNER JOIN address on user.user_id=address.address_user_id INNER Join emergency_contact_details on user.user_id =emergency_contact_details.emergency_contact_details_user_id INNER JOIN clinical_area_to_user_lookup on user.user_id = user.user_id INNER Join clinical_area on clinical_area_to_user_lookup.clinical_area_to_user_lookup_clinical_area_id = clinical_area.clinical_area_id INNER JOIN role on user.user_role_id_fk= role.role_id INNER JOIN band on role.role_band_id= band.band_id; ",
-    req.params.test_id,
+    "SELECT user_id, user_name, user_email_address,user_start_date, user_bank_staff_number,user_current_trust_employee_in_current_role,contact_details_tel_number, contact_details_personal_email,  contact_details_preffer_personal_email_contact, address_line_1, address_line_2, address_line_3,  address_postcode,address_town, address_county, emergency_contact_details_name, emergency_contact_details_tel_number, emergency_contact_details__relationship,clinical_area_title,role_title,band_title FROM user INNER Join contact_details on user.user_id = contact_details.contact_details_user_id INNER JOIN address on user.user_id=address.address_user_id INNER Join emergency_contact_details on user.user_id =emergency_contact_details.emergency_contact_details_user_id INNER JOIN clinical_area_to_user_lookup on user.user_id = user.user_id INNER Join clinical_area on clinical_area_to_user_lookup.clinical_area_to_user_lookup_clinical_area_id = clinical_area.clinical_area_id INNER JOIN role on user.user_role_id_fk= role.role_id INNER JOIN band on role.role_band_id= band.band_id WHERE user.user_id = ? ; ",
+    req.params.userId,
     function (error, results, feilds) {
       if (error) throw error;
+      res.json(results);
+    }
+  );
+});
+
+app.route("/personal_profile_select_band").get(function (req, res) {
+  var userId = req.params.userId;
+  console.log("in personal_profile_selectt_band router api");
+  connection.query(
+    "SELECT band_title FROM band",
+    req.params.userId,
+    function (error, results, feilds) {
+      console.log(results);
+      if (error) throw error;
+
+      res.json(results);
+    }
+  );
+});
+
+
+app.route("/personal_profile_select_clinical_area").get(function (req, res) {
+  var userId = req.params.userId;
+  console.log("in personal_profile_select-clinical_area router api");
+  connection.query(
+    "SELECT clinical_area_title FROM clinical_area;",
+    req.params.userId,
+    function (error, results, feilds) {
+      if (error) throw error;
+      console.log(results);
+      res.json(results);
+    }
+  );
+});
+
+app.route("/personal_profile_select_role").get(function (req, res) {
+  var userId = req.params.userId;
+  console.log("in personal_profile_select_rolerouter api");
+  connection.query(
+    "SELECT role_title FROM role;",
+    req.params.userId,
+    function (error, results, feilds) {
+      if (error) throw error;
+      console.log(results);
       res.json(results);
     }
   );

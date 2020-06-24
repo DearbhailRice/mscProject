@@ -1,18 +1,20 @@
 import React, { Component } from "react";
 import Navbar from "../../components/navbar";
 import Table from "../../components/table";
-
+import "../../styles/personalProfile/personalProfile.scss"
+import PersonalInfo from "../personalInfo";
 
 
 export default class learningProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            columnHearder: ["Id", "Training Title", "Valid for (years)", "Mandatory", "Duration", "Completion Date"],
+            columnHearder: ["Training Title", "Valid for (years)", "Mandatory", "Duration", "Completion Date"],
             rowData: [[]],
             redirectURL: "/learning-profile",
             currentPoID: "",
-            exceptionStatus: 0
+            exceptionStatus: 0,
+            componentTitle: "Learning Profile "
         }
     }
 
@@ -28,7 +30,7 @@ export default class learningProfile extends Component {
             .then(dbres => {
                 tableArray = dbres.map(item => {
                     return [
-                        item.user_id,
+                        // item.user_id,
                         item.training_title,
                         item.training_revalidation_period_years,
                         item.training_mandatory,
@@ -48,11 +50,14 @@ export default class learningProfile extends Component {
 
     render() {
         return (
-            <div className="learning-profile">
-
-                {console.log("on earning-profile page ")}
+            <div className="personalProfile">
+                {console.log("on learning-profile page ")}
                 <Navbar />
-                <Table {...this.state} navigateRow={this.redirect.bind(this)} />
+
+                <div className="personalInfo">
+                    <Table {...this.state} navigateRow={this.redirect.bind(this)} />
+                    {/* <PersonalInfo {...this.state} navigateRow={this.redirect.bind(this)} /> */}
+                </div>
 
             </div>
         )
@@ -60,6 +65,7 @@ export default class learningProfile extends Component {
     redirect() {
         this.props.history.push({
             pathname: this.state.redirectURL
+
         })
     }
 }

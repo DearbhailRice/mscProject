@@ -1,18 +1,38 @@
 .tableWrapper{
+    width: 100%;
     padding: 5%;
     display: inline-flex;
+    margin: 50px 70px 10px 70px;
+    box-shadow: 0px 35px 50px rgba(0,0,0,0.3);
 }
-.element{
-    // border: thin solid black;
-}
-.title{
-     width: 30%;
-    border: thin solid green($color: hsl(199, 94%, 57%));
-}
-.data{
-  flex: auto;
-   float: right;
 
-    width: 65%;
-   border: thin solid green($color: hsl(310, 94%, 57%));
+.titleElement{
+    justify-content: left;
+    text-align: left;
+}
+
+.dataElement{
+    justify-content: left;
+    margin-left: 20px;
+}
+.tableTitle{
+    text-align: left;
+    width: 90%;
+    text-decoration: underline;
+}
+.h1{
+    width: auto;
+}
+.captionDiv{
+    display: inline-flex;
+    width: 100%;
+   
+}
+
+// .editIcon{
+//     float: right;
+// }
+
+table{
+    width: 100%;
 }

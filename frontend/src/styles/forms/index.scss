@@ -1,14 +1,37 @@
 
 .formDiv{
     display: inline-flex;
-    border: thin solid lightgrey;
     width:80%;
-    margin: 5% 10% 5%% 10%;
-    // justify-content: center;
-    
+    margin: 50px 70px 10px 70px;
+    box-shadow: 0px 35px 50px rgba(0,0,0,0.3);
+
+}
+fieldset{
+    width: 100%;
+    display: inline-flex;
+    border: none;
 }
 
 .formElement{
-    display: flex;
-    margin: 15px;
+    width:90%;
+    margin: 3%;
+}
+
+.formInput{
+    display: inline-flex;
+    width:50%;
+    margin-left: 10px;
+}
+.formLabel{
+    display: inline-flex;
+    width:100%;
+}
+.formElement .formButton{
+float: right;
+margin-right: 5%;
+margin-bottom: 5%;
+}
+
+.title{
+    text-decoration: underline;
 }

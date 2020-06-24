@@ -13,7 +13,16 @@
     max-width: 100%;
     white-space: nowrap;
 }
-
+.captionDiv{
+    display: inline-flex;
+    width: 100%;
+   
+}
+.tableTitle{
+    text-align: left;
+    width: 90%;
+    text-decoration: underline;
+}
 .table th,
 .table td{
     text-align: center;
@@ -64,8 +73,7 @@ width: 100%;
     font-size: 13px;
 }
 
-
-
-
-
 }
+
+
+
