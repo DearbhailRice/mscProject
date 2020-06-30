@@ -11,8 +11,9 @@ var testAPIRouter = require("./routes/testAPI");
 var cors = require("cors");
 var app = express();
 var testdbRouter = require("./routes/test")
-var personalProfileRouter = require("./routes/personalProfile")
-
+// var personalProfileRouter = require("./routes/personalProfile")
+// const request = require("request");
+// const cbor = require("cbor");
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -98,7 +99,6 @@ app.route("/learning-profile-select").get(function (req, res) {
 
 
 app.route("/personal_profile_select:userId").get(function (req, res) {
-  var userId = req.params.userId;
   console.log("in personal_profile_select router api");
   connection.query(
     "SELECT user_id, user_name, user_email_address,user_start_date, user_bank_staff_number,user_current_trust_employee_in_current_role,contact_details_tel_number, contact_details_personal_email,  contact_details_preffer_personal_email_contact, address_line_1, address_line_2, address_line_3,  address_postcode,address_town, address_county, emergency_contact_details_name, emergency_contact_details_tel_number, emergency_contact_details__relationship,clinical_area_title,role_title,band_title FROM user INNER Join contact_details on user.user_id = contact_details.contact_details_user_id INNER JOIN address on user.user_id=address.address_user_id INNER Join emergency_contact_details on user.user_id =emergency_contact_details.emergency_contact_details_user_id INNER JOIN clinical_area_to_user_lookup on user.user_id = user.user_id INNER Join clinical_area on clinical_area_to_user_lookup.clinical_area_to_user_lookup_clinical_area_id = clinical_area.clinical_area_id INNER JOIN role on user.user_role_id_fk= role.role_id INNER JOIN band on role.role_band_id= band.band_id WHERE user.user_id = ? ; ",
@@ -111,7 +111,6 @@ app.route("/personal_profile_select:userId").get(function (req, res) {
 });
 
 app.route("/personal_profile_select_band").get(function (req, res) {
-  var userId = req.params.userId;
   console.log("in personal_profile_selectt_band router api");
   connection.query(
     "SELECT band_title FROM band",
@@ -127,7 +126,6 @@ app.route("/personal_profile_select_band").get(function (req, res) {
 
 
 app.route("/personal_profile_select_clinical_area").get(function (req, res) {
-  var userId = req.params.userId;
   console.log("in personal_profile_select-clinical_area router api");
   connection.query(
     "SELECT clinical_area_title FROM clinical_area;",
@@ -141,7 +139,6 @@ app.route("/personal_profile_select_clinical_area").get(function (req, res) {
 });
 
 app.route("/personal_profile_select_role").get(function (req, res) {
-  var userId = req.params.userId;
   console.log("in personal_profile_select_rolerouter api");
   connection.query(
     "SELECT role_title FROM role;",
@@ -153,6 +150,91 @@ app.route("/personal_profile_select_role").get(function (req, res) {
     }
   );
 });
+
+app.route("/login_select:user_email").get(function (req, res) {
+  var userLoginData = {};
+  console.log("in  api");
+  console.log("user_email " + req.params.user_email)
+  connection.query(
+    "SELECT user_id, user_email_address, password_text FROM `user` INNER Join password on user_id= password_user_id where user_email_address = ?;",
+    req.params.user_email,
+    function (error, results, feilds) {
+      console.log("Error " + error)
+      if (error) throw error;
+
+      userLoginData = JSON.parse(JSON.stringify(results));
+
+
+
+      console.log(results);
+      res.json(results);
+    }
+  );
+
+});
+
+app.route("/login_push").post(function (req, res) {
+
+  const payload = req.body;
+
+  console.log(" in api post payload: " + payload)
+  console.log("email " + payload.user_email)
+  console.log("password" + payload.user_password)
+
+  console.log("In /login_push api push  ")
+
+  var user_password = payload.user_password;
+  var user_id = 0;
+  var message = "";
+  var user_email = payload.user_email;
+  var isCorrectLogin = false;
+  console.log("user_email " + user_email)
+
+
+  connection.query(
+    "SELECT user_id, user_email_address, password_text FROM `user` INNER Join password on user_id= password_user_id where user_email_address = ?;",
+    user_email,
+    function (error, results, feilds) {
+      console.log("Error " + error)
+
+      if (results < 1) {
+        console.log("results < 1 " + results)
+        message = "email " + user_email + "does not match an existing user";
+      }
+      else if (error) {
+        console.log("Error " + error)
+        throw error;
+      }
+      else {
+
+        console.log("db results " + JSON.stringify(results))
+        console.log(" results.user_email_address " + results[0].user_email_address)
+
+
+        if ((user_email == results[0].user_email_address) && (user_password == results[0].password_text)) {
+          user_id = results[0].user_id;
+          message = "email and password match";
+          isCorrectLogin = true;
+
+        } else if ((user_email == results[0].user_email_address) && (!user_password == results[0].password_text)) {
+          message = "password is incorrect";
+
+        } else {
+          message = "username and password do not match";
+
+        }
+      }
+      const responseObj = {
+        user_id: user_id,
+        message: message,
+        isCorrectLogin: isCorrectLogin
+      }
+      console.log(JSON.stringify(responseObj));
+      return res.json(responseObj)
+    });
+
+});
+
 
 
 // catch 404 and forward to error handler
