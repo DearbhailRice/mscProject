@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import "../../styles/table/table.scss"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
+
 
 export default class Table extends Component {
     constructor(props) {
@@ -16,14 +15,7 @@ export default class Table extends Component {
                 <div className="tableWrapper">
                     <table className="table">
 
-                        <caption>
-                            <div className="captionDiv">
-                                <h2>{this.props.componentTitle} </h2>
-                                <a onClick={() => { window.location.href = "/learningProfileEdit" }}>
-                                    <FontAwesomeIcon className="editIcon" icon={faEdit} size="1x" style={{ margin: "19px" }} />
-                                </a>
-                            </div>
-                        </caption>
+
                         <thead>
 
                             {this.props.columnHearder.map((headerName, title) => {

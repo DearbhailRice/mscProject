@@ -63,7 +63,7 @@ app.route("/learning-profile-select").get(function (req, res) {
   console.log("in  router api");
   connection.query(
     "SELECT * FROM learning_profile INNER JOIN training on learning_profile.learning_profile_training_id= training.training_id INNER JOIN user on learning_profile_user_id = user.user_id	 WHERE learning_profile.learning_profile_user_id=1;",
-    function (error, results, feilds) {
+    function (error, results) {
       if (error) throw error;
       res.json(results);
     }
@@ -110,27 +110,37 @@ app.route("/personal_profile_select:userId").get(function (req, res) {
   );
 });
 
-app.route("/personal_profile_select_band").get(function (req, res) {
-  console.log("in personal_profile_selectt_band router api");
-  connection.query(
-    "SELECT band_title FROM band",
-    req.params.userId,
-    function (error, results, feilds) {
-      console.log(results);
+app.route("/role_band_select").get(function (req, res) {
+  connection.query("SELECT role_title, role_band_id FROM role;",
+    req.params.role_id,
+    function (error, results) {
       if (error) throw error;
-
-      res.json(results);
+      res.json(results)
     }
   );
 });
 
+// app.route("/personal_profile_select_band").get(function (req, res) {
+//   console.log("in personal_profile_selectt_band router api");
+//   connection.query(
+//     "SELECT band_title FROM band",
+//     req.params.userId,
+//     function (error, results) {
+//       console.log(results);
+//       if (error) throw error;
 
-app.route("/personal_profile_select_clinical_area").get(function (req, res) {
+//       res.json(results);
+//     }
+//   );
+// });
+
+
+app.route("/clinical_area_select").get(function (req, res) {
   console.log("in personal_profile_select-clinical_area router api");
   connection.query(
     "SELECT clinical_area_title FROM clinical_area;",
-    req.params.userId,
-    function (error, results, feilds) {
+    req.params.clinical_area_id,
+    function (error, results) {
       if (error) throw error;
       console.log(results);
       res.json(results);
@@ -138,18 +148,7 @@ app.route("/personal_profile_select_clinical_area").get(function (req, res) {
   );
 });
 
-app.route("/personal_profile_select_role").get(function (req, res) {
-  console.log("in personal_profile_select_rolerouter api");
-  connection.query(
-    "SELECT role_title FROM role;",
-    req.params.userId,
-    function (error, results, feilds) {
-      if (error) throw error;
-      console.log(results);
-      res.json(results);
-    }
-  );
-});
+
 
 app.route("/login_select:user_email").get(function (req, res) {
   var userLoginData = {};
@@ -163,8 +162,6 @@ app.route("/login_select:user_email").get(function (req, res) {
       if (error) throw error;
 
       userLoginData = JSON.parse(JSON.stringify(results));
-
-
 
       console.log(results);
       res.json(results);
@@ -234,6 +231,56 @@ app.route("/login_push").post(function (req, res) {
     });
 
 });
+
+
+
+// componentWillMount() {
+//   let optionsObj = [];
+//   let roleObj = {};
+//   let caObj = {};
+//   let combineArr = [];
+
+//   fetch("http://localhost:3001/role_band_select").then(res => {
+//       console.log("editRes.status " + res.status);
+//       if (res.status === 200) { return res.json(); }
+//       throw `Invalid Query`
+//   }).then(dbres => {
+//       console.log("editdbres" + dbres)
+//       roleObj = dbres.map(editItem => {
+//           console.log("editItem.role_title " + editItem.role_title)
+//           return {
+//               type: "Role",
+//               option1: editItem.role_title,
+//               option2: editItem.role_band_id
+//           };
+//       });
+//       console.log("optionsObj " + JSON.stringify(optionsObj, null, 4));
+
+//       fetch("http://localhost:3001/clinical_area_select").then(cares => {
+//           console.log("editRes.status " + cares.status);
+//           if (cares.status === 200) { return cares.json(); }
+//           throw `Invalid Query`
+//       }).then(caDbres => {
+//           console.log("editdbres" + caDbres)
+//           caObj = caDbres.map(caEditItem => {
+
+//               return {
+//                   type: "Clinical Area",
+//                   option1: caEditItem.clinical_area_title,
+//               };
+//           });
+
+//           combineArr.push(roleObj, caObj);
+
+//           this.setState({
+//               options: combineArr
+//           })
+//           console.log("options " + this.state.options);
+//       })
+//   }).catch(err => {
+//       alert(err);
+//   })
+// }
 
 
 

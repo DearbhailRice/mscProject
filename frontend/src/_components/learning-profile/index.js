@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import Navbar from "../../_components/navbar";
 import Table from "../../_components/table";
-import "../../styles/personalProfile/personalProfile.scss"
-import PersonalInfo from "../personalInfo";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import "../../styles/learningProfile/learningProfile.scss"
 
 export default class learningProfile extends Component {
     constructor(props) {
@@ -12,7 +12,6 @@ export default class learningProfile extends Component {
             columnHearder: ["Training Title", "Valid for (years)", "Mandatory", "Duration", "Completion Date"],
             rowData: [[]],
             redirectURL: "/learning-profile",
-            currentPoID: "",
             exceptionStatus: 0,
             componentTitle: "Learning Profile "
         }
@@ -22,10 +21,9 @@ export default class learningProfile extends Component {
         let tableArray = [];
         fetch("http://localhost:3001/learning-profile-select")
             .then(res => {
-
                 console.log(res.status);
                 if (res.status === 200) { return res.json(); }
-                // throw `Invalid Query`
+                throw `Invalid Query`
             })
             .then(dbres => {
                 tableArray = dbres.map(item => {
@@ -50,13 +48,23 @@ export default class learningProfile extends Component {
 
     render() {
         return (
-            <div className="personalProfile">
+            <div className="learningProfile">
                 {console.log("on learning-profile page ")}
                 <Navbar />
 
-                <div className="personalInfo">
-                    <Table {...this.state} navigateRow={this.redirect.bind(this)} />
-                    {/* <PersonalInfo {...this.state} navigateRow={this.redirect.bind(this)} /> */}
+                <div className="learningInfo">
+                    <div className="wrapperDiv">
+                        <div className="captionDiv">
+                            <h2 className="tableTitle" >{this.state.componentTitle} </h2>
+                            <a onClick={() => { window.location.href = "/learningProfileEdit" }}>
+                                <FontAwesomeIcon className="editIcon" icon={faEdit} size="1x" style={{ margin: "19px" }} />
+                            </a>
+                        </div>
+                        <div className="learningTable">
+                            <Table {...this.state} className="learningTable" />
+                            {/* <PersonalInfo {...this.state} navigateRow={this.redirect.bind(this)} /> */}
+                        </div>
+                    </div>
                 </div>
 
             </div>

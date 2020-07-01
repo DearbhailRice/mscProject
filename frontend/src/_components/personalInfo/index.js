@@ -16,29 +16,29 @@ export default class PersonalInfo extends Component {
     render() {
         return (
 
-            <div className="tableWrapper">
-                <table >
 
-                    <tbody>
-                        <tr>
-                            <div className="data">
-                                {console.log("coulmn array length " + this.props.columnHearder.length)}
-                                {this.props.columnHearder.map((headerName, index) => {
-                                    return <tr>
-                                        <th scope="row"> <p className="titleElement" key={index}>{headerName}:</p></th>
-                                        {this.props.rowData.map(dataRow => {
-                                            return <td> <p className="dataElement" > {dataRow[index]}</p></td>
-                                        })
-                                        }
-                                    </tr>
+            <table className="tableWrapper">
 
-                                })}
+                <tbody>
+                    <tr>
+                        <div className="data">
+                            {console.log("coulmn array length " + this.props.columnHearder.length)}
+                            {this.props.columnHearder.map((headerName, index) => {
+                                return <tr>
+                                    <th scope="row"> <p className="titleElement" key={index}>{headerName}:</p></th>
+                                    {this.props.rowData.map(dataRow => {
+                                        return <td> <p className="dataElement" > {dataRow[index]}</p></td>
+                                    })
+                                    }
+                                </tr>
 
-                            </div>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                            })}
+
+                        </div>
+                    </tr>
+                </tbody>
+            </table>
+
 
 
         );

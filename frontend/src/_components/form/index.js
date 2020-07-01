@@ -3,22 +3,57 @@ import "../../styles/forms/index.scss";
 
 
 
-export default class formUser extends Component {
+export default class Form extends Component {
     constructor(props) {
         super(props);
         this.state = {
+
         };
 
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
-    generateRow(typeOfInput, index) {
+    checkOptionType(optionData, label) {
+
+
+        optionData.map((data, indexData) => {
+
+            if (("Role" == data.type) && ("Role" == label)) {
+                if (!data.option1) {
+                    return
+                }
+                console.log("in role if")
+                console.log("Band " + data.option2 + " " + data.option1)
+                return <option key={indexData} value={data}>{"Band " + data.option2 + " " + data.option1}</option>
+            } else if (("Clinical Area" == data.type) && ("Clinical Area" == label)) {
+                if (!data.option1) {
+                    return
+                }
+                console.log("in else ")
+                return <option key={indexData} value={data}>{data.option1}</option>
+            } else {
+                return
+            }
+
+        })
+
+
+    }
+
+    generateRow(typeOfInput, index, label) {
         let inputValue;
+        let isDisabled = false;
+
         switch (typeOfInput) {
             case "checkbox": inputValue = 1;
                 break;
             case "option": inputValue = "option";
                 break;
+            case "disabled": inputValue = "disabled";
+                isDisabled = true;
+                break;
+            case "radio":
+
             case "text":
 
             case "email":
@@ -30,6 +65,7 @@ export default class formUser extends Component {
                     inputValue = this.props.rowData.map(dataInRow => {
                         return dataInRow[index];
                     })
+
                 } else {
                     inputValue = typeOfInput;
                 }
@@ -37,24 +73,58 @@ export default class formUser extends Component {
             default: inputValue = typeOfInput;
 
         }
-        // if (typeOfInput == "option") {
-        //     console.log("options" + JSON.stringify(this.props.options))
 
-        //     {
-        //         this.props.options.map((optionData, indexOption) => {
-        //             console.log("optional Data " + optionData);
 
-        //             return <select > <option key={indexOption} value={indexOption.role_id}>{JSON.stringify(indexOption)}</option> </select>
-        //         })
+        if (typeOfInput == "radio") {
+            return <div className="radioButtons">
+                <label >
+                    <input type="radio" id="Yes" name="preferance" value="Yes" />
+                Yes
+                </label>
+                <label>
+                    <input type="radio" id="No" name="preferance" value="No" />
+                No
+                </label>
+            </div>
 
-        //         return
-        //     }
+        }
 
-        // }
-        return <input className="formInput" type={typeOfInput} defaultValue={inputValue} /> //onChange={this.handleChange}  value={inputValue}
+        if (typeOfInput == "option") {
+
+            return <select>
+                {this.props.options.map((optionData, indexOption) => {
+                    console.log("optional Data " + JSON.stringify(optionData, null, 4))
+                    this.checkOptionType(optionData, indexOption)
+                    return optionData.map((data, indexData) => {
+                        console.log("data " + data.type);
+                        if (("Role" == data.type) && ("Role" == label)) {
+                            if (!data.option1) {
+                                return
+                            }
+                            console.log("in role if")
+                            console.log("Band " + data.option2 + " " + data.option1)
+                            return <option key={indexData} value={data}>{"Band " + data.option2 + " " + data.option1}</option>
+                        } else if (("Clinical Area" == data.type) && ("Clinical Area" == label)) {
+                            if (!data.option1) {
+                                return
+                            }
+                            console.log("in else ")
+                            return <option key={indexData} value={data}>{data.option1}</option>
+                        } else {
+                            return
+                        }
+                    })
+                })}
+            </select>
+
+        }
+
+
+        return <input className="formInput" type={typeOfInput} defaultValue={inputValue} disabled={isDisabled} /> //onChange={this.handleChange}  value={inputValue}
 
 
     }
+
     handleInputChange(event) {
         const target = event.target;
         const value = target.name === 'isGoing' ? target.checked : target.value;
@@ -70,7 +140,7 @@ export default class formUser extends Component {
     }
 
     render() {
-        debugger
+
         return (
             <div className="formComponenet">
 
@@ -83,13 +153,10 @@ export default class formUser extends Component {
                                 return <div className="formElement">
                                     <label className="formLabel" key={index}>
                                         {label}:
-
-                                        {this.generateRow(this.props.inputType[index], index)}
-
+                                        {this.generateRow(this.props.inputType[index], index, label)}
                                     </label>
                                 </div>
                             })}
-
                             <div className="formElement">
                                 <input className="formButton" type="submit" value="Save" />
                                 <input className="formButton" type="reset" value="Reset" />

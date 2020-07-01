@@ -4,7 +4,6 @@ import "../../styles/personalProfile/personalProfile.scss"
 import PersonalInfo from "../personalInfo";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
-import { useAuth } from "../../context/auth";
 
 export default class personalProfile extends Component {
     constructor(props) {
@@ -23,16 +22,13 @@ export default class personalProfile extends Component {
     componentWillMount() {
         let profileArray = [];
         var userId = 1;
-        let optionsArray = [];
-        debugger
+
         fetch("http://localhost:3001/personal_profile_select" + userId)
             .then(res => {
-
                 console.log(res.status);
                 if (res.status === 200) { return res.json(); }
                 throw `Invalid Query`
-            })
-            .then(dbres => {
+            }).then(dbres => {
                 profileArray = dbres.map(item => {
 
 
@@ -49,7 +45,7 @@ export default class personalProfile extends Component {
 
                     if (item.user_current_trust_employee_in_current_role === 1) {
                         console.log("in profileArray item.user_current_trust_employee_in_current_role if yes")
-                        item.contact_details_preffer_personal_email_contact = "Yes";
+                        item.user_current_trust_employee_in_current_role = "Yes";
                         console.log(" item.user_current_trust_employee_in_current_role" + item.user_current_trust_employee_in_current_role)
 
                     } else {
@@ -94,7 +90,7 @@ export default class personalProfile extends Component {
                 console.log("Profile array " + JSON.stringify(profileArray, null, 4));
 
                 this.setState({
-                    options: optionsArray,
+
                     rowData: profileArray
 
                 })
@@ -108,16 +104,21 @@ export default class personalProfile extends Component {
                 {console.log("on personal-profile page ")}
                 < Navbar />
 
-                <div className="personalInfo">
-                    <div className="captionDiv">
-                        <caption className="tableTitle" ><h2>{this.props.componentTitle} </h2></caption>
-                        <a onClick={() => { this.redirect("/personalProfile/edit", { ...this.state }) }} >
-                            <FontAwesomeIcon className="editIcon" icon={faEdit} size="1x" style={{ margin: "19px" }} />
-                        </a>
-                    </div>
-                    <PersonalInfo {...this.state} />
-                </div>
+                <div className="personalProfileContent">
+                    <div className="wrapperDiv">
+                        <div>
+                            <h2 className="tableTitle">{this.state.componentTitle} </h2>
+                            <a className="editButton" onClick={() => { this.redirect("/personalProfile/edit", { ...this.state }) }} >
+                                <FontAwesomeIcon className="editIcon" icon={faEdit} size="1x" style={{ margin: "19px" }} />
+                            </a>
+                        </div>
 
+
+                        <div className="personalInfoDiv">
+                            <PersonalInfo {...this.state} className="personalInfo" />
+                        </div>
+                    </div>
+                </div>
             </div>
         )
     }
