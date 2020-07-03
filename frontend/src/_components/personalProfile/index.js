@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Navbar from "../navbar";
 import "../../styles/personalProfile/personalProfile.scss"
 import PersonalInfo from "../personalInfo";
+import Edit from "../personalInfo/edit"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 
@@ -9,20 +10,20 @@ export default class personalProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            columnHearder: ["Name", "Work Email", "Start Date", "Staff Number", "Current Trust Employee", "Tel. Number", "Personal Email", "Contact on Personal Email", "Address Line 1", "Address Line 2", "Address Line 3", "Postcode", "Town", "County", "Emergency Contact Name ", "Emergency Contact Tel. Number", "Emergency Contact Relationship", "Clinical Area ", "Role", "Band"],
-            rowData: [[]],
+            // columnHearder: ["Name", "Work Email", "Start Date", "Staff Number", "Current Trust Employee", "Tel. Number", "Personal Email", "Contact on Personal Email", "Address Line 1", "Address Line 2", "Address Line 3", "Postcode", "Town", "County", "Emergency Contact Name ", "Emergency Contact Tel. Number", "Emergency Contact Relationship", "Clinical Area ", "Role", "Band"],
+            profileData: {},
             redirectURL: "personalInfo/edit.js",
-            currentPoID: "",
-            exceptionStatus: 0,
             componentTitle: "Personal Profile ",
+            isEdit: false,
+
 
         }
     }
 
     componentWillMount() {
         let profileArray = [];
-        var userId = 1;
-
+        var userId = JSON.parse(localStorage.getItem('tokens'))['user_id'];
+        // var userId = 1;
         fetch("http://localhost:3001/personal_profile_select" + userId)
             .then(res => {
                 console.log(res.status);
@@ -62,36 +63,36 @@ export default class personalProfile extends Component {
 
 
 
-                    return [
-                        item.user_name,
-                        item.user_email_address,
-                        item.user_start_date,
-                        item.user_bank_staff_number,
-                        item.user_current_trust_employee_in_current_role,
-                        item.contact_details_tel_number,
-                        item.contact_details_personal_email,
-                        item.contact_details_preffer_personal_email_contact,
-                        item.address_line_1,
-                        item.address_line_2,
-                        item.address_line_3,
-                        item.address_postcode,
-                        item.address_town,
-                        item.address_county,
-                        item.emergency_contact_details_name,
-                        item.emergency_contact_details_tel_number,
-                        item.emergency_contact_details__relationship,
-                        item.clinical_area_title,
-                        item.role_title,
-                        item.band_title
+                    return {
+                        "Name": item.user_name,
+                        "Work Email": item.user_email_address,
+                        "Start Date": item.user_start_date,
+                        "Staff Number": item.user_bank_staff_number,
+                        "Current Trust Employee": item.user_current_trust_employee_in_current_role,
+                        "Tel. Number": item.contact_details_tel_number,
+                        "Personal Email": item.contact_details_personal_email,
+                        "Contact on Personal Email": item.contact_details_preffer_personal_email_contact,
+                        "Address Line 1": item.address_line_1,
+                        "Address Line 2": item.address_line_2,
+                        "Address Line 3": item.address_line_3,
+                        "Postcode": item.address_postcode,
+                        "Town": item.address_town,
+                        "County": item.address_county,
+                        "Emergency Contact Name": item.emergency_contact_details_name,
+                        "Emergency Contact Tel. Number": item.emergency_contact_details_tel_number,
+                        "Emergency Contact Relationship": item.emergency_contact_details__relationship,
+                        "Clinical Area": item.clinical_area_title,
+                        "Role": item.role_title,
+                        "Band": item.role_band_id
 
-                    ];
+                    };
 
                 });
                 console.log("Profile array " + JSON.stringify(profileArray, null, 4));
 
                 this.setState({
 
-                    rowData: profileArray
+                    profileData: profileArray[0]
 
                 })
             }).catch(err => {
@@ -108,14 +109,20 @@ export default class personalProfile extends Component {
                     <div className="wrapperDiv">
                         <div>
                             <h2 className="tableTitle">{this.state.componentTitle} </h2>
-                            <a className="editButton" onClick={() => { this.redirect("/personalProfile/edit", { ...this.state }) }} >
+                            <a className="editButton" onClick={() => { this.setState({ isEdit: true }) }} >
                                 <FontAwesomeIcon className="editIcon" icon={faEdit} size="1x" style={{ margin: "19px" }} />
                             </a>
                         </div>
 
 
                         <div className="personalInfoDiv">
-                            <PersonalInfo {...this.state} className="personalInfo" />
+
+                            {(!this.state.isEdit) ?
+                                <PersonalInfo {...this.state} className="personalInfo" />
+                                :
+                                <Edit {...this.state} />
+                            }
+
                         </div>
                     </div>
                 </div>

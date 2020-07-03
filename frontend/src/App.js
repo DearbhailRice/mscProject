@@ -6,21 +6,23 @@ import personalProfile from './_components/personalProfile';
 import login from './_components/login';
 import personalProfileEdit from './_components/personalInfo/edit.js';
 import addUser from "./_components/addUser";
-import Admin from "./_components/admin";
+import Logout from "./_components/logout";
 import { AuthContext } from "./context/auth";
 import PrivateRoute from './_components/privateRoute';
-
+import AddUser from "./_components/addUser"
+import Reset from "./_components/reset"
 
 function App(props) {
 
   const existingTokens = JSON.parse(localStorage.getItem("tokens"));
-  //clear using date stamp? ?create date stamp obj
+
+  //imporovements: clear using date stamp? ?create date stamp obj to do this 
   const [authTokens, setAuthTokens] = useState(existingTokens);
 
   const setTokens = (data) => {
-    localStorage.setItem("tokens", JSON.stringify(data));
+    localStorage.setItem("tokens", data);
 
-    //add js cookie instead of local storgae add expiary token 
+    //improvements: add js cookie instead of local storgae add expiary token 
     setAuthTokens(data);
   }
 
@@ -33,10 +35,12 @@ function App(props) {
           {/* <PrivateRoute excat path="/add-user" componet={addUser} /> */}
           <Route exact path="/forgotPassword" component={forgotPassword} />
           <Route exact path="/login" component={login} />
+          <Route exact path="/reset/:token/:userId" component={Reset} />
           <PrivateRoute exact path="/learning-profile" component={learningProfile} />
           <PrivateRoute exact path="/personal-profile" component={personalProfile} />
           <PrivateRoute exact path="/personalProfile/edit" component={personalProfileEdit} />
-          <PrivateRoute path="/admin" component={Admin} />
+          <PrivateRoute path="/logout" component={Logout} />
+          <PrivateRoute path="/adduser" component={AddUser} />
         </Switch>
       </AuthContext.Provider>
     </div>

@@ -7,35 +7,24 @@ export default class PersonalInfo extends Component {
         super(props);
         this.State = {
 
-            rowData: this.props.rowData
-
         }
     }
 
 
     render() {
+        console.log(Object.keys(this.props.profileData))
         return (
-
-
             <table className="tableWrapper">
-
                 <tbody>
-                    <tr>
-                        <div className="data">
-                            {console.log("coulmn array length " + this.props.columnHearder.length)}
-                            {this.props.columnHearder.map((headerName, index) => {
-                                return <tr>
-                                    <th scope="row"> <p className="titleElement" key={index}>{headerName}:</p></th>
-                                    {this.props.rowData.map(dataRow => {
-                                        return <td> <p className="dataElement" > {dataRow[index]}</p></td>
-                                    })
-                                    }
-                                </tr>
 
-                            })}
+                    {/* {console.log("coulmn array length " + this.props.columnHearder.length)} */}
+                    {Object.keys(this.props.profileData).map((headerName, index) => {
+                        return <tr>
+                            <th scope="row"> <p className="titleElement" key={index}>{headerName}:</p></th>
+                            <td> <p className="dataElement" > {this.props.profileData[headerName]}</p></td>
+                        </tr>
+                    })}
 
-                        </div>
-                    </tr>
                 </tbody>
             </table>
 

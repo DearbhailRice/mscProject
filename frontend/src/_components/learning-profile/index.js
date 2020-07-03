@@ -19,7 +19,10 @@ export default class learningProfile extends Component {
 
     componentWillMount() {
         let tableArray = [];
-        fetch("http://localhost:3001/learning-profile-select")
+        // const userId = JSON.parse(localStorage.getItem('tokens'))['user_id'];
+        const userId = 1;
+
+        fetch("http://localhost:3001/learning-profile-select" + userId)
             .then(res => {
                 console.log(res.status);
                 if (res.status === 200) { return res.json(); }

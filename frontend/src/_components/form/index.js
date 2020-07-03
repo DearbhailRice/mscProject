@@ -9,8 +9,9 @@ export default class Form extends Component {
         this.state = {
 
         };
-
-        this.handleInputChange = this.handleInputChange.bind(this);
+    }
+    cancelEdit = () => {
+        document.getElementById("formWrapper").reset();
     }
 
     checkOptionType(optionData, label) {
@@ -24,14 +25,21 @@ export default class Form extends Component {
                 }
                 console.log("in role if")
                 console.log("Band " + data.option2 + " " + data.option1)
-                return <option key={indexData} value={data}>{"Band " + data.option2 + " " + data.option1}</option>
+                return <option key={indexData} value={data} onChange={(e) => {
+                    const value = e.target.value;
+                    this.props.onChange(label, value)
+                }}>{"Band " + data.option2 + " " + data.option1}</option>
             } else if (("Clinical Area" == data.type) && ("Clinical Area" == label)) {
                 if (!data.option1) {
                     return
                 }
                 console.log("in else ")
-                return <option key={indexData} value={data}>{data.option1}</option>
-            } else {
+                return <option key={indexData} value={data} onChange={(e) => {
+                    const value = e.target.value;
+                    this.props.onChange(label, value)
+                }}>{data.option1}</option>
+            }
+            else {
                 return
             }
 
@@ -61,14 +69,7 @@ export default class Form extends Component {
             case "date":
 
             case "tel":
-                if (this.props.rowData.length > 0) {
-                    inputValue = this.props.rowData.map(dataInRow => {
-                        return dataInRow[index];
-                    })
-
-                } else {
-                    inputValue = typeOfInput;
-                }
+                inputValue = this.props.profileData[label];
                 break;
             default: inputValue = typeOfInput;
 
@@ -78,11 +79,17 @@ export default class Form extends Component {
         if (typeOfInput == "radio") {
             return <div className="radioButtons">
                 <label >
-                    <input type="radio" id="Yes" name="preferance" value="Yes" />
+                    <input type="radio" id="Yes" name={"preferance " + label} value="Yes" onChange={(e) => {
+                        const value = e.target.value;
+                        this.props.onChange(label, value)
+                    }} />
                 Yes
                 </label>
                 <label>
-                    <input type="radio" id="No" name="preferance" value="No" />
+                    <input type="radio" id="No" name={"preferance " + label} value="No" onChange={(e) => {
+                        const value = e.target.value;
+                        this.props.onChange(label, value)
+                    }} />
                 No
                 </label>
             </div>
@@ -91,7 +98,11 @@ export default class Form extends Component {
 
         if (typeOfInput == "option") {
 
-            return <select>
+            return <select onChange={(e) => {
+
+                const value = e.target.value;
+                this.props.onChange(label, value)
+            }} required>
                 {this.props.options.map((optionData, indexOption) => {
                     console.log("optional Data " + JSON.stringify(optionData, null, 4))
                     this.checkOptionType(optionData, indexOption)
@@ -101,15 +112,18 @@ export default class Form extends Component {
                             if (!data.option1) {
                                 return
                             }
+
+
+                            let opt = data.option1 + "," + data.option2;
                             console.log("in role if")
                             console.log("Band " + data.option2 + " " + data.option1)
-                            return <option key={indexData} value={data}>{"Band " + data.option2 + " " + data.option1}</option>
+                            return <option key={indexData} value={opt} >{"Band " + data.option2 + " " + data.option1}</option>
                         } else if (("Clinical Area" == data.type) && ("Clinical Area" == label)) {
                             if (!data.option1) {
                                 return
                             }
                             console.log("in else ")
-                            return <option key={indexData} value={data}>{data.option1}</option>
+                            return <option key={indexData} value={data.option1}>{data.option1}</option>
                         } else {
                             return
                         }
@@ -120,46 +134,52 @@ export default class Form extends Component {
         }
 
 
-        return <input className="formInput" type={typeOfInput} defaultValue={inputValue} disabled={isDisabled} /> //onChange={this.handleChange}  value={inputValue}
+        return <input className="formInput" id={label} type={typeOfInput} defaultValue={inputValue} disabled={isDisabled} onChange={(e) => {
+            const value = e.target.value;
+            this.props.onChange(label, value, e)
+
+        }
+        } />
 
 
     }
 
-    handleInputChange(event) {
-        const target = event.target;
-        const value = target.name === 'isGoing' ? target.checked : target.value;
-        const name = target.name;
-
-        this.setState({
-            [name]: value
-        });
-    }
-    handleSubmit(event) {
-        alert('A name was submitted: ' + this.state.value);
-        event.preventDefault();
-    }
 
     render() {
 
+        //label  and value \\ componentTitle 
+
         return (
             <div className="formComponenet">
+                {(!this.props.validateError) ? <div></div>
+                    :
 
+                    <div className="error">
+                        {console.log(this.props.validateError)}
+                        {this.props.validateError}
+                    </div>
+                }
                 <div className="formDiv">
                     <fieldset className="fieldset">
 
-                        <form onSubmit={this.handleSubmit}>
-                            <h2 className="title">{this.props.componentTitle}</h2>
-                            {this.props.formElementLable.map((label, index) => {
+                        <form id="formWrapper">
+
+                            {Object.keys(this.props.profileData).map((label, index) => {
                                 return <div className="formElement">
-                                    <label className="formLabel" key={index}>
-                                        {label}:
+                                    {(label == "Band") ? <div></div>
+
+                                        :
+                                        <label className="formLabel" key={index}>
+                                            {label}:
                                         {this.generateRow(this.props.inputType[index], index, label)}
-                                    </label>
+                                        </label>}
                                 </div>
                             })}
+
                             <div className="formElement">
-                                <input className="formButton" type="submit" value="Save" />
-                                <input className="formButton" type="reset" value="Reset" />
+
+                                <button className="formButton" type="submit" value="Save" onClick={this.props.onSubmit} >Save</button>
+                                <input className="formButton" type="reset" value="Cancel" onClick={() => { window.location.href = this.props.originUrl }} />
                             </div>
                         </form>
                     </fieldset>

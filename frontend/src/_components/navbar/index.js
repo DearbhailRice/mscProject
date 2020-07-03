@@ -11,6 +11,8 @@ export default class Navbar extends Component {
     }
 
     render() {
+        // const isAdmin = JSON.parse(JSON.stringify(localStorage.getItem("tokens")["isAdmin"]));
+        // console.log("is admin " + isAdmin)
         return (
             <div className="navbar">
                 <header className="header">
@@ -22,7 +24,7 @@ export default class Navbar extends Component {
                     <div className="navComponents">
                         <ul>
                             <li>
-                                <a onClick={() => { window.location.href = "/login" }}>
+                                <a onClick={() => { (!localStorage.tokens) ? window.location.href = "/login" : window.location.href = "/logout" }}>
                                     <FontAwesomeIcon icon={faSignInAlt} size="2x" style={{ color: "darkgray" }} />
                                 </a>
                             </li>
@@ -35,6 +37,12 @@ export default class Navbar extends Component {
                                 <a onClick={() => { window.location.href = "/learning-profile" }}>
                                     <FontAwesomeIcon icon={faGraduationCap} size="2x" style={{ color: "darkgray" }} />
                                 </a>
+                            </li>
+
+                            <li>
+                                {/* <a onClick={() => { (!localStorage.getItem('tokens')['isAdmin']) ? null : hidden }}>
+                                    <FontAwesomeIcon icon={faSignInAlt} size="2x" style={{ color: "darkgray" }} />
+                                </a> */}
                             </li>
 
                         </ul>

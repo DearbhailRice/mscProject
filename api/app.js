@@ -1,4 +1,5 @@
-// require("dotenv").config();
+var Crypto = require('crypto');
+require("dotenv").config();
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -11,9 +12,7 @@ var testAPIRouter = require("./routes/testAPI");
 var cors = require("cors");
 var app = express();
 var testdbRouter = require("./routes/test")
-// var personalProfileRouter = require("./routes/personalProfile")
-// const request = require("request");
-// const cbor = require("cbor");
+const nodemailer = require("nodemailer");
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -30,7 +29,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use("/testAPI", testAPIRouter);
 app.use("/test", testdbRouter);
-//app.use("/personal_profile_select:userId", personalProfileRouter);
+
 
 app.route("/test_select_all").get(function (req, res) {
   console.log("in test_select_all router api");
@@ -59,10 +58,11 @@ app.route("/test_select_all").get(function (req, res) {
 
 });
 
-app.route("/learning-profile-select").get(function (req, res) {
+app.route("/learning-profile-select:userId").get(function (req, res) {
   console.log("in  router api");
   connection.query(
-    "SELECT * FROM learning_profile INNER JOIN training on learning_profile.learning_profile_training_id= training.training_id INNER JOIN user on learning_profile_user_id = user.user_id	 WHERE learning_profile.learning_profile_user_id=1;",
+    "SELECT * FROM learning_profile INNER JOIN training on learning_profile.learning_profile_training_id= training.training_id INNER JOIN user on learning_profile_user_id = user.user_id	 WHERE learning_profile.learning_profile_user_id= ? ; ",
+    req.params.userId,
     function (error, results) {
       if (error) throw error;
       res.json(results);
@@ -101,7 +101,7 @@ app.route("/learning-profile-select").get(function (req, res) {
 app.route("/personal_profile_select:userId").get(function (req, res) {
   console.log("in personal_profile_select router api");
   connection.query(
-    "SELECT user_id, user_name, user_email_address,user_start_date, user_bank_staff_number,user_current_trust_employee_in_current_role,contact_details_tel_number, contact_details_personal_email,  contact_details_preffer_personal_email_contact, address_line_1, address_line_2, address_line_3,  address_postcode,address_town, address_county, emergency_contact_details_name, emergency_contact_details_tel_number, emergency_contact_details__relationship,clinical_area_title,role_title,band_title FROM user INNER Join contact_details on user.user_id = contact_details.contact_details_user_id INNER JOIN address on user.user_id=address.address_user_id INNER Join emergency_contact_details on user.user_id =emergency_contact_details.emergency_contact_details_user_id INNER JOIN clinical_area_to_user_lookup on user.user_id = user.user_id INNER Join clinical_area on clinical_area_to_user_lookup.clinical_area_to_user_lookup_clinical_area_id = clinical_area.clinical_area_id INNER JOIN role on user.user_role_id_fk= role.role_id INNER JOIN band on role.role_band_id= band.band_id WHERE user.user_id = ? ; ",
+    "SELECT user_id, user_name, user_email_address,user_start_date, user_bank_staff_number,user_current_trust_employee_in_current_role,contact_details_tel_number, contact_details_personal_email,  contact_details_preffer_personal_email_contact, address_line_1, address_line_2, address_line_3,  address_postcode,address_town, address_county, emergency_contact_details_name, emergency_contact_details_tel_number, emergency_contact_details__relationship,clinical_area_title,role_title,role_band_id FROM user INNER Join contact_details on user.user_id = contact_details.contact_details_user_id INNER JOIN address on user.user_id=address.address_user_id INNER Join emergency_contact_details on user.user_id =emergency_contact_details.emergency_contact_details_user_id INNER JOIN clinical_area_to_user_lookup on user.user_id = user.user_id INNER Join clinical_area on clinical_area_to_user_lookup.clinical_area_to_user_lookup_clinical_area_id = clinical_area.clinical_area_id INNER JOIN role on user.user_role_id_fk= role.role_id INNER JOIN band on role.role_band_id= band.band_id WHERE user.user_id = ? ; ",
     req.params.userId,
     function (error, results, feilds) {
       if (error) throw error;
@@ -119,20 +119,6 @@ app.route("/role_band_select").get(function (req, res) {
     }
   );
 });
-
-// app.route("/personal_profile_select_band").get(function (req, res) {
-//   console.log("in personal_profile_selectt_band router api");
-//   connection.query(
-//     "SELECT band_title FROM band",
-//     req.params.userId,
-//     function (error, results) {
-//       console.log(results);
-//       if (error) throw error;
-
-//       res.json(results);
-//     }
-//   );
-// });
 
 
 app.route("/clinical_area_select").get(function (req, res) {
@@ -185,6 +171,7 @@ app.route("/login_push").post(function (req, res) {
   var message = "";
   var user_email = payload.user_email;
   var isCorrectLogin = false;
+  var user_admin = false;
   console.log("user_email " + user_email)
 
 
@@ -220,9 +207,15 @@ app.route("/login_push").post(function (req, res) {
           message = "username and password do not match";
 
         }
+        if (results[0].user_admin === 1) {
+          user_admin = true;
+        } else {
+          user_admin = false;
+        }
       }
       const responseObj = {
         user_id: user_id,
+        isAdmin: user_admin,
         message: message,
         isCorrectLogin: isCorrectLogin
       }
@@ -234,54 +227,299 @@ app.route("/login_push").post(function (req, res) {
 
 
 
-// componentWillMount() {
-//   let optionsObj = [];
-//   let roleObj = {};
-//   let caObj = {};
-//   let combineArr = [];
+app.route("/forgottenPassword_push").post(function (req, res) {
 
-//   fetch("http://localhost:3001/role_band_select").then(res => {
-//       console.log("editRes.status " + res.status);
-//       if (res.status === 200) { return res.json(); }
-//       throw `Invalid Query`
-//   }).then(dbres => {
-//       console.log("editdbres" + dbres)
-//       roleObj = dbres.map(editItem => {
-//           console.log("editItem.role_title " + editItem.role_title)
-//           return {
-//               type: "Role",
-//               option1: editItem.role_title,
-//               option2: editItem.role_band_id
-//           };
-//       });
-//       console.log("optionsObj " + JSON.stringify(optionsObj, null, 4));
+  const payload = req.body;
 
-//       fetch("http://localhost:3001/clinical_area_select").then(cares => {
-//           console.log("editRes.status " + cares.status);
-//           if (cares.status === 200) { return cares.json(); }
-//           throw `Invalid Query`
-//       }).then(caDbres => {
-//           console.log("editdbres" + caDbres)
-//           caObj = caDbres.map(caEditItem => {
+  console.log(" in api post payload: " + payload)
+  console.log("email " + payload.user_email)
+  console.log("password" + payload.user_password)
 
-//               return {
-//                   type: "Clinical Area",
-//                   option1: caEditItem.clinical_area_title,
-//               };
-//           });
+  console.log("In /forgottenPassword_push api push  ")
 
-//           combineArr.push(roleObj, caObj);
+  var user_password = payload.user_password;
+  var user_id = 0;
+  var message = "";
+  var user_email = payload.user_email;
+  var resetEmailSent = false;
+  console.log("user_email " + user_email)
 
-//           this.setState({
-//               options: combineArr
-//           })
-//           console.log("options " + this.state.options);
-//       })
-//   }).catch(err => {
-//       alert(err);
-//   })
+
+  connection.query(
+    "SELECT user_id, user_email_address FROM `user` where user_email_address =  ?;",
+    user_email,
+    function (error, results, feilds) {
+      console.log("Error " + error)
+
+      if (results < 1) {
+        console.log("results < 1 " + results)
+        message = "email " + user_email + "does not match an existing user";
+      }
+      else if (error) {
+        console.log("Error " + error)
+        throw error;
+      }
+      else {
+        console.log(results)
+        console.log("db results " + JSON.stringify(results))
+        console.log(" results.user_email_address " + results[0].user_email_address)
+
+
+        if ((user_email == results[0].user_email_address)) {
+          const token = Crypto.randomBytes(20).toString("hex");
+          const userId = results[0].user_idVAR;
+
+          console.log("useid " + userId)
+
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: 'nhsct.elearm@gmail.com',
+              pass: 'mscPassword'
+            }
+          })
+
+          const mailOptions = {
+            from: "nhsct.e-learm@gmail.com",
+            to: user_email,
+            subject: "password reset request for Northern HSCT e-learning platform  ",
+            text:
+              "a password reset request has been made for this email if this was you please click the following link: \n\n" +
+              "http://localhost:3000/reset/" + token + "/" + userId + "\n\n" +
+              "if this reset was not you pklease ignore this email "
+          };
+
+          transporter.sendMail(mailOptions, function (err, response) {
+            if (err) {
+              console.log("mail error: ", err);
+            } else {
+              console.log("mail response ", response);
+              res.status(200).json("recovery email sent ")
+            }
+          })
+
+          user_id = results[0].user_id;
+          message = "email address found, reset email sent";
+          resetEmailSent = true;
+
+        }
+        const responseObj = {
+          user_id: user_id,
+          message: message,
+          resetEmailSent: resetEmailSent
+        }
+        console.log(JSON.stringify(responseObj));
+        return res.json(responseObj)
+      };
+
+    });
+});
+
+
+
+app.route("/personal-profile-edit").post(function (req, res) {
+
+  const payload = req.body;
+  console.log("payload data ", payload.data)
+  console.log("payload.userId " + payload.userId)
+  var userId = payload.userId;
+  var bandRole = payload.data["Role"];
+  if (bandRole.includes(",")) {
+    var bandRoleArr = bandRole.split(",");
+    var role = bandRoleArr[0];
+    var band = bandRoleArr[1];
+  } else {
+    var role = payload.data["Role"];
+    var band = payload.data["Band"];
+  }
+  var name = payload.data["Name"];
+  var address1 = payload.data["Address Line 1"];
+  var address2 = payload.data["Address Line 2"];
+  var address3 = payload.data["Address Line 3"];
+  var clinicalArea = payload.data["Clinical Area"];
+  var contactPersonalEmail = (payload.data["Contact on Personal Email"] == "Yes") ? 1 : 0;;
+  var county = payload.data["County"];
+  var curentTrustEmployee = (payload.data["Current Trust Employee"] == "Yes") ? 1 : 0;
+  var emergencyConName = payload.data["Emergency Contact Name"];
+  var emergencyConRelationship = payload.data["Emergency Contact Relationship"];
+  var emergencyConTel = payload.data["Emergency Contact Tel. Number"];
+  var personalEmail = payload.data["Personal Email"];
+  var postcode = payload.data["Postcode"];
+  var staffNumber = payload.data["Staff Number"];
+  var startDate = payload.data["Tel. Number"];
+  var telNum = payload.data["Tel. Number"];
+  var town = payload.data["Town"];
+  var workEmail = payload.data["Work Email"];
+  console.log("api push ", userId)
+  console.log("band ", band)
+  console.log("role ", role)
+
+  var message = "";
+  var sucessfulEdit = false;
+
+  connection.query(" select role_id from role where role_band_id = " + band + " AND  role_title= " + JSON.stringify(role) + ";"
+    , function (error, roleresults, feilds) {
+      if (error) {
+        console.log("Error " + error)
+        message = "Error update unsucessful " + error;
+
+      }
+      let roleId = roleresults[0].role_id;
+
+
+      connection.query("select clinical_area_id from clinical_area where clinical_area_title = " + JSON.stringify(clinicalArea) + ";"
+        , function (error, caresults, feilds) {
+          if (error) {
+            console.log("Error " + error)
+            message = "Error update unsucessful " + error;
+
+          }
+          let clinicalAreaId = caresults[0].clinical_area_id;
+
+
+          console.log("roleId ", roleId)
+          console.log("clinicalAreaId", clinicalAreaId)
+          // console.log("UPDATE msc_project.user user INNER Join contact_details on user.user_id = contact_details.contact_details_user_id INNER JOIN address on user.user_id=address.address_user_id INNER Join emergency_contact_details on user.user_id =emergency_contact_details.emergency_contact_details_user_id INNER JOIN clinical_area_to_user_lookup on user.user_id = user.user_id INNER Join clinical_area on clinical_area_to_user_lookup.clinical_area_to_user_lookup_clinical_area_id = clinical_area.clinical_area_id INNER JOIN role on user.user_role_id_fk= role.role_id INNER JOIN band on role.role_band_id= band.band_id "
+          //   + "SET user_name = " + name + ",user_email_address =" + workEmail + ",user_start_date= " + startDate + ", user_bank_staff_number=" + staffNumber
+          //   + " ,user_current_trust_employee_in_current_role=" + curentTrustEmployee + ",contact_details_tel_number= " + telNum
+          //   + ",contact_details_personal_email=" + personalEmail + ",contact_details_preffer_personal_email_contact=" + contactPersonalEmail + ",address_line_1= " + address1
+          //   + ",address_line_2=" + address2 + ",address_line_3=" + address3 + ", address_postcode=" + postcode + ",address_town=" + town
+          //   + ",address_county=" + county + ", emergency_contact_details_name=" + emergencyConName + ",emergency_contact_details_tel_number=" + emergencyConTel
+          //   + ",emergency_contact_details__relationship=" + emergencyConRelationship + ",user_role_id_fk =" + roleId + ",clinical_area_to_user_lookup_clinical_area_id=" +
+          //   clinicalAreaId + "  WHERE `user`.`user_id` = " + userId + ";",
+          // )
+          // 
+          connection.query("UPDATE msc_project.user user INNER Join contact_details on user.user_id = contact_details.contact_details_user_id INNER JOIN address on user.user_id=address.address_user_id INNER Join emergency_contact_details on user.user_id =emergency_contact_details.emergency_contact_details_user_id INNER JOIN clinical_area_to_user_lookup on user.user_id = user.user_id INNER Join clinical_area on clinical_area_to_user_lookup.clinical_area_to_user_lookup_clinical_area_id = clinical_area.clinical_area_id INNER JOIN role on user.user_role_id_fk= role.role_id INNER JOIN band on role.role_band_id= band.band_id "
+            + "SET user_name = " + JSON.stringify(name) + ",user_email_address =" + JSON.stringify(workEmail) + ",user_start_date= " + startDate + ", user_bank_staff_number=" + staffNumber
+            + " ,user_current_trust_employee_in_current_role=" + curentTrustEmployee + ",contact_details_tel_number= " + JSON.stringify(telNum)
+            + ",contact_details_personal_email=" + JSON.stringify(personalEmail) + ",contact_details_preffer_personal_email_contact=" + contactPersonalEmail + ",address_line_1= " + JSON.stringify(address1)
+            + ",address_line_2=" + JSON.stringify(address2) + ",address_line_3=" + JSON.stringify(address3) + ", address_postcode=" + JSON.stringify(postcode) + ",address_town=" + JSON.stringify(town)
+            + ",address_county=" + JSON.stringify(county) + ", emergency_contact_details_name=" + JSON.stringify(emergencyConName) + ",emergency_contact_details_tel_number=" + JSON.stringify(emergencyConTel)
+            + ",emergency_contact_details__relationship=" + JSON.stringify(emergencyConRelationship) + ",user_role_id_fk =" + roleId + ",clinical_area_to_user_lookup_clinical_area_id=" +
+            clinicalAreaId + "  WHERE `user`.`user_id` = " + userId + ";",
+            function (error, results, feilds) {
+              if (error) {
+                console.log("Error " + error)
+                message = "Error update unsucessful " + error;
+              } else {
+                message = "update sucessful"
+                sucessfulEdit = true;
+              }
+              const responseObj = {
+                message: message,
+                sucessfulEdit: sucessfulEdit
+              }
+              console.log(JSON.stringify(responseObj));
+              return res.json(responseObj)
+            });
+        });
+    });
+
+
+  // connection.query("UPDATE msc_project.user user INNER Join contact_details on user.user_id = contact_details.contact_details_user_id INNER JOIN address on user.user_id=address.address_user_id INNER Join emergency_contact_details on user.user_id =emergency_contact_details.emergency_contact_details_user_id INNER JOIN clinical_area_to_user_lookup on user.user_id = user.user_id INNER Join clinical_area on clinical_area_to_user_lookup.clinical_area_to_user_lookup_clinical_area_id = clinical_area.clinical_area_id INNER JOIN role on user.user_role_id_fk= role.role_id INNER JOIN band on role.role_band_id= band.band_id SET user_name = 'testUser1',user_email_address ='updateuesremail@email.com',user_start_date= 01/01/01, user_bank_staff_number=123 ,user_current_trust_employee_in_current_role= 1,contact_details_tel_number= '098765432',contact_details_personal_email='personalemailupdated@email',contact_details_preffer_personal_email_contact= 1,address_line_1= 'updated address',address_line_2='updatedline2',address_line_3='updated line 2', address_postcode='posctcodeupdate',address_town='updateTown',address_county='updatedconty', emergency_contact_details_name='updated emergency contactname',emergency_contact_details_tel_number='1234567999',emergency_contact_details__relationship='updated relationship',user_role_id_fk = 1,clinical_area_to_user_lookup_clinical_area_id=1  WHERE `user`.`user_id` = 1;",
+  //   payload.userId,
+  //   function (error, results, feilds) {
+  //     if (error) {
+  //       console.log("Error " + error)
+  //       throw error;
+  //     }
+  //     const responseObj = {
+  //       message: "got a response "
+  //     }
+  //     console.log(JSON.stringify(responseObj));
+  //     return res.json(responseObj)
+  //   });
+});
+
+
+// app.route("/add_user").post(function (req, res) {
+//   const payload = req.body;
+
+//   console.log("payload data ", payload.data)
+//   console.log("payload.userId " + payload.userId)
+
+//   var band = payload.data["Band"];
+//   var role = payload.data["Role"];
+//   var name = payload.data["Name"];
+//   var curentTrustEmployee = (payload.data["Current Trust Employee"] == "Yes") ? 1 : 0;
+//   var staffNumber = payload.data["Staff Number"];
+//   var startDate = payload.data["Tel. Number"];
+//   var workEmail = payload.data["Work Email"];
+//   var password = payload.data["Password"];
+//   var date = Date.now;
+//   console.log("date ", date)
+
+//   //"+JSON.stringify()+"
+//   connection.query(" select role_id from role where role_band_id = " + band + " AND  role_title= " + JSON.stringify(role) + ";"
+//     , function (error, roleresults, feilds) {
+//       if (error) {
+//         console.log("Error " + error)
+//         throw error;
+//       }
+//       let roleId = roleresults[0].role_id;
+
+
+//       connection.query("INSERT INTO `msc_project`.`user` (`user_id`, `user_name`, `user_email_address`, `user_start_date`, `user_bank_staff_number`, `user_current_trust_employee_in_current_role`, `user_role_id_fk`) VALUES (NULL, " + JSON.stringify(name) + ", " + JSON.stringify(workEmail) + ", " + JSON.stringify(startDate) + ", " + JSON.stringify(staffNumber) + ", " + curentTrustEmployee + ", " + roleId + ");"
+//         , function (error, roleresults, feilds) {
+//           if (error) {
+//             console.log("Error " + error)
+//             throw error;
+//           }
+
+//           connection.query("SELECT user_id FROM `user`  where user_email_address = " + workEmail + ";",
+//             function (error, roleresults, feilds) {
+//               if (error) {
+//                 console.log("Error " + error)
+//                 throw error;
+//               }
+//               let userId = roleresults[0].user_id;
+
+//               connection.query("INSERT INTO `msc_project`.`password` (`password_id`, `password_user_id`, `password_text`, `password_previous_text`, `password_date`) VALUES (NULL, " + userId + ", " + JSON.stringify(password) + ", null , " + date + ");"
+//                 , function (error, roleresults, feilds) {
+//                   if (error) {
+//                     console.log("Error " + error)
+//                     throw error;
+//                   }
+//                   const responseObj = {
+//                     message: "got a response "
+//                   }
+
+//                   return res.json(responseObj)
+//                 });
+//             });
+//         });
+//     });
+
 // }
 
+app.route("/reset_password_push").post(function (req, res) {
+
+  const payload = req.body;
+  let passwordReset = false;
+  let message = "";
+  console.log("payload data ", payload.data)
+  console.log("payload.userId " + payload.userId)
+  var userId = payload.userId;
+  var password = payload.data["password1"];
+
+  connection.query("UPDATE `msc_project`.`password` SET `password_text` = " + JSON.stringify(password) + " WHERE `password`.`password_user_id` = " + userId + ";"
+    , function (error, caresults, feilds) {
+      if (error) {
+        console.log("Error " + error)
+        message = error;
+      } else {
+        message = "Update Sucessful! Please login with new password"
+        passwordReset = true;
+      }
+
+      const responseObj = {
+        message: message,
+        passwordReset: passwordReset
+      }
+      res.json(responseObj)
+
+    })
+})
 
 
 // catch 404 and forward to error handler
