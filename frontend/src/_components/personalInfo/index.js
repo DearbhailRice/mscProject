@@ -6,31 +6,38 @@ export default class PersonalInfo extends Component {
     constructor(props) {
         super(props);
         this.State = {
-
+            profileData: this.props.profileData
         }
     }
 
 
     render() {
-        console.log(Object.keys(this.props.profileData))
-        return (
-            <table className="tableWrapper">
-                <tbody>
+        if (!this.props.profileData) {
+            console.log("profiledata " + this.props.profileData)
 
-                    {/* {console.log("coulmn array length " + this.props.columnHearder.length)} */}
-                    {Object.keys(this.props.profileData).map((headerName, index) => {
-                        return <tr>
-                            <th scope="row"> <p className="titleElement" key={index}>{headerName}:</p></th>
-                            <td> <p className="dataElement" > {this.props.profileData[headerName]}</p></td>
-                        </tr>
-                    })}
+            return window.location.href = "/personal-profile/add"
 
-                </tbody>
-            </table>
+        } else {
+            console.log(Object.keys(this.props.profileData))
+
+            return (
+                <table className="tableWrapper">
+                    <tbody>
+                        {Object.keys(this.props.profileData).map((headerName, index) => {
+                            return <tr>
+                                <th scope="row"> <p className="titleElement" key={index}>{headerName}:</p></th>
+                                <td> <p className="dataElement" > {this.props.profileData[headerName]}</p></td>
+                            </tr>
+                        })}
+
+
+                    </tbody>
+                </table>
 
 
 
-        );
+            );
+        }
     }
     redirect() {
         this.props.history.push({

@@ -59,7 +59,6 @@ function Login(props) {
                     message: data.message,
                     isCorrectLogin: data.isCorrectLogin,
                     isAdmin: data.isAdmin
-                    //return user admin type return user object name, email admintype, get this .state.current user
                 }
                 console.log("loginRes.isCorrectLogin " + JSON.stringify(loginRes.isCorrectLogin))
                 if (loginRes.isCorrectLogin) {
@@ -141,10 +140,7 @@ function Login(props) {
                                  </button>
 
                                 </Form>
-                                {/* <Link to="/forgotPassword">Forgotten your password?</Link> */}
                                 <Link to="/forgotPassword">Forgotten your password?</Link>
-                                {/* {console.log("loginRes.message " + this.loginRes.message)}
-                                {isError && <p>{loginRes.message}</p>} */}
                             </div>
                         )}
                     </Formik>

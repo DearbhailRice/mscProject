@@ -19,10 +19,10 @@ function Reset(props) {
     const referer = (state) ? props.location.state.referer || redirectVar : redirectVar;
 
     const { token } = props.match.params;
-    const userId = props.match.params.userId;
+    const { userId } = props.match.params;
 
-    console.log(token);
-    console.log(userId);
+    console.log("token ", token);
+    console.log("userId ", userId);
 
     let resetRes = {};
 
@@ -64,7 +64,6 @@ function Reset(props) {
         if (e.target.name == "password2") {
             if (e.target.value != password.password1) {
                 // message= "passwords do not match"
-                // debugger
                 setIsError(true);
                 setError({ "password2": "passwords do not match" })
             } else if (e.target.name == "password2") {

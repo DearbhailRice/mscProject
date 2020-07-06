@@ -3,7 +3,7 @@ import "../../styles/personalInfo/personalInfo.scss";
 import Form from "../form";
 import Navbar from "../navbar";
 
-export default class PersonalInfo extends Component {
+export default class PersonalInfoEdit extends Component {
     constructor(props) {
         super(props);
 
@@ -77,7 +77,6 @@ export default class PersonalInfo extends Component {
         })
     }
     validate(key, value, ObjToUpdate) {
-        //e.target.value
         let error = {}
         this.setState({ validateError: null });
         console.log("value ", value);
@@ -110,7 +109,6 @@ export default class PersonalInfo extends Component {
 
     }
     handleDataUpdate(key, value, e) {
-        // debugger
         console.log("key ", key)
         let ObjToUpdate = this.state.profileData
         console.log(ObjToUpdate, " OBJECT UPDATED")
@@ -164,7 +162,7 @@ export default class PersonalInfo extends Component {
             if (editRes.sucessfulEdit) {
                 window.location.href = "/personal-profile"
             }
-            // setSubmitting(false);
+
         }, 400)
 
     }

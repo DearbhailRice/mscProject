@@ -3,16 +3,22 @@ import { Route } from "react-router-dom";
 import "../../styles/navbar/navbar.scss";
 import Logo from "../../images/NHSCT.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faSignInAlt, faGraduationCap } from "@fortawesome/free-solid-svg-icons";
+import { faBook, faUser, faUserPlus, faSignInAlt, faGraduationCap } from "@fortawesome/free-solid-svg-icons";
 
 export default class Navbar extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+        }
     }
-
     render() {
-        // const isAdmin = JSON.parse(JSON.stringify(localStorage.getItem("tokens")["isAdmin"]));
-        // console.log("is admin " + isAdmin)
+        let isAdmin = false;
+        if (!localStorage.tokens) {
+            isAdmin = false;
+        } else {
+            isAdmin = JSON.parse(localStorage.getItem('tokens'))['isAdmin'];
+            console.log("is admin ", isAdmin)
+        }
         return (
             <div className="navbar">
                 <header className="header">
@@ -40,10 +46,23 @@ export default class Navbar extends Component {
                             </li>
 
                             <li>
-                                {/* <a onClick={() => { (!localStorage.getItem('tokens')['isAdmin']) ? null : hidden }}>
-                                    <FontAwesomeIcon icon={faSignInAlt} size="2x" style={{ color: "darkgray" }} />
-                                </a> */}
+                                <a onClick={() => { window.location.href = "/training" }}>
+                                    <FontAwesomeIcon icon={faBook} size="2x" style={{ color: "darkgray" }} />
+                                </a>
                             </li>
+
+                            {(!isAdmin) ? <li></li> :
+                                <li>
+                                    <a onClick={() => { window.location.href = "/adduser" }}>
+                                        <FontAwesomeIcon icon={faUserPlus} size="2x" style={{ color: "darkgray" }} />
+                                    </a>
+                                </li>
+                            }
+
+
+
+
+
 
                         </ul>
 
@@ -51,5 +70,6 @@ export default class Navbar extends Component {
                 </header>
             </div>
         );
+
     }
 }

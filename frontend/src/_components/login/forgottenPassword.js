@@ -17,7 +17,9 @@ function ForgottenPassword(props) {
     const { state } = props.location;
     const referer = (state) ? props.location.state.referer || redirectVar : redirectVar;
 
-
+    if (localStorage.tokens) {
+        window.location.href = "/"
+    }
     let forgottenPasswordRes = {};
 
 

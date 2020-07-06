@@ -5,25 +5,22 @@ import PersonalInfo from "../personalInfo";
 import Edit from "../personalInfo/edit"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
-
+import moment from "moment";
 export default class personalProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // columnHearder: ["Name", "Work Email", "Start Date", "Staff Number", "Current Trust Employee", "Tel. Number", "Personal Email", "Contact on Personal Email", "Address Line 1", "Address Line 2", "Address Line 3", "Postcode", "Town", "County", "Emergency Contact Name ", "Emergency Contact Tel. Number", "Emergency Contact Relationship", "Clinical Area ", "Role", "Band"],
             profileData: {},
-            redirectURL: "personalInfo/edit.js",
+            redirectURL: "personal-profile/edit",
             componentTitle: "Personal Profile ",
             isEdit: false,
-
-
         }
     }
 
     componentWillMount() {
         let profileArray = [];
         var userId = JSON.parse(localStorage.getItem('tokens'))['user_id'];
-        // var userId = 1;
+
         fetch("http://localhost:3001/personal_profile_select" + userId)
             .then(res => {
                 console.log(res.status);
@@ -66,7 +63,7 @@ export default class personalProfile extends Component {
                     return {
                         "Name": item.user_name,
                         "Work Email": item.user_email_address,
-                        "Start Date": item.user_start_date,
+                        "Start Date": moment(item.user_start_date).format("DD-MM-YY"),
                         "Staff Number": item.user_bank_staff_number,
                         "Current Trust Employee": item.user_current_trust_employee_in_current_role,
                         "Tel. Number": item.contact_details_tel_number,

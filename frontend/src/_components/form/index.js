@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import "../../styles/forms/index.scss";
+import moment from 'moment';
 
 
 
@@ -60,23 +61,37 @@ export default class Form extends Component {
             case "disabled": inputValue = "disabled";
                 isDisabled = true;
                 break;
+
+            case "date":
+
             case "radio":
 
             case "text":
 
             case "email":
 
-            case "date":
+            case "time":
 
             case "tel":
+
+            case "file":
                 inputValue = this.props.profileData[label];
                 break;
             default: inputValue = typeOfInput;
 
         }
 
+        if (typeOfInput == "file") {
+            return <input className="formInput" name={label} id={label} type={typeOfInput} disabled={isDisabled} onChange={(e) => {
+                const value = e.target.value;
 
-        if (typeOfInput == "radio") {
+                this.props.onChange(label, value, e)
+
+            }
+            } />
+        }
+
+        else if (typeOfInput == "radio") {
             return <div className="radioButtons">
                 <label >
                     <input type="radio" id="Yes" name={"preferance " + label} value="Yes" onChange={(e) => {
@@ -96,13 +111,14 @@ export default class Form extends Component {
 
         }
 
-        if (typeOfInput == "option") {
+        else if (typeOfInput == "option") {
 
             return <select onChange={(e) => {
 
                 const value = e.target.value;
                 this.props.onChange(label, value)
             }} required>
+                <option key={"Please Select"} value={"Please Select"}>Please Select</option>
                 {this.props.options.map((optionData, indexOption) => {
                     console.log("optional Data " + JSON.stringify(optionData, null, 4))
                     this.checkOptionType(optionData, indexOption)
@@ -147,7 +163,6 @@ export default class Form extends Component {
 
     render() {
 
-        //label  and value \\ componentTitle 
 
         return (
             <div className="formComponenet">
@@ -162,7 +177,9 @@ export default class Form extends Component {
                 <div className="formDiv">
                     <fieldset className="fieldset">
 
-                        <form id="formWrapper">
+                        <form id="formWrapper" enctype="multipart/form-data">
+
+
 
                             {Object.keys(this.props.profileData).map((label, index) => {
                                 return <div className="formElement">
