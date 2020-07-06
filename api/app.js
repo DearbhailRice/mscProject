@@ -769,25 +769,9 @@ app.post('/learning_profile_edit', upload.single('Certificate Upload'), (req, re
   var fileName = payload.data["Certificate Upload"];
   console.log("FileName", fileName)
   let message = "";
-  // var file = fs.readFileSync(req.file.path);
-  // var encode_file = file.toString('base64');
 
-  // var finalfile = {
-  //   contentType: req.file.mimetype,
-  //   file: new Buffer(encode_file, 'base64')
-  // };
 
-  // if (req.file) {
-  //   console.log('Uploading file...');
-  //   var filename = req.file.filename;
-  //   var uploadStatus = 'File Uploaded Successfully';
-  // } else {
-  //   console.log('No File Uploaded');
-  //   var filename = 'FILE NOT UPLOADED';
-  //   var uploadStatus = 'File Upload Failed';
-  // }
 
-  //UPDATE msc_project.learning_profile SET learning_profile_certificate_path='blob:http://localhost:3000/c65490f9-f12d-49e8-940c-fcb01ce51683',learning_profile_date_completed= 2020-07-06 WHERE learning_profile.learning_profile_training_id= 1 AND learning_profile.learning_profile_user_id= 1
   console.log(`UPDATE msc_project.learning_profile SET learning_profile_certificate_path='${fileName}',learning_profile_date_completed= ${trainingDateComplete} WHERE learning_profile.learning_profile_training_id= ${trainingId} AND learning_profile.learning_profile_user_id= ${userId}`)
   connection.query(`UPDATE msc_project.learning_profile SET learning_profile_certificate_path='${fileName}',learning_profile_date_completed= ${trainingDateComplete} WHERE learning_profile.learning_profile_training_id= ${trainingId} AND learning_profile.learning_profile_user_id= ${userId};`
     , function (error, results) {
@@ -865,7 +849,31 @@ app.route("/training-add").post(async function (req, res) {
     });
 });
 
+app.route("/learning-profile-delete").delete(function (req, res) {
 
+  console.log("In learning-profile-delete")
+
+  const payload = req.body;
+  console.log("payload data ", payload.data)
+  console.log("payload.userId " + payload.userId)
+  var userId = payload.userId;
+  var message = "";
+  var trainingId = payload.trainingId;
+
+  connection.query(`DELETE FROM msc_project.learning_profile WHERE learning_profile_training_id=${trainingId} AND learning_profile_user_id=${userId}`
+    , function (error, results) {
+      if (error) throw error;
+
+      message = "Learning Profile training record Deleted "
+
+      const responseObj = {
+        message: message,
+      }
+      console.log(JSON.stringify(responseObj));
+      return res.json(responseObj)
+
+    });
+});
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
