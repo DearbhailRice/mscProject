@@ -72,6 +72,12 @@ export default class Table extends Component {
                                                 }
                                                 }>Edit</button></td>
                                             }
+                                            else if (cellData == "removeButton") {
+                                                return <td><button onClick={() => {
+                                                    this.props.removeTraining(dataRow[0]);
+                                                }
+                                                }>Remove</button></td>
+                                            }
                                             else {
                                                 return <td>{cellData}</td>
                                             }

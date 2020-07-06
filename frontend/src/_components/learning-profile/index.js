@@ -10,7 +10,7 @@ export default class learningProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            columnHearder: ["Training Id", "Training Title", "Valid for (years)", "Mandatory", "Duration (Hours)", "Completion Date", "Certificate", "Edit"],
+            columnHearder: ["Training Id", "Training Title", "Valid for (years)", "Mandatory", "Duration (Hours)", "Completion Date", "Certificate", "Edit", "Remove"],
             rowData: [[]],
             redirectURL: "/learning-profile",
             componentTitle: "Learning Profile ",
@@ -34,6 +34,7 @@ export default class learningProfile extends Component {
         let tableArray = [];
         const userId = JSON.parse(localStorage.getItem('tokens'))['user_id'];
         let editButton = "editButton";
+        let removeButton = "removeButton";
 
         fetch("http://localhost:3001/learning-profile-select" + userId)
             .then(res => {
@@ -70,7 +71,8 @@ export default class learningProfile extends Component {
                         item.training_duration,
                         item.learning_profile_date_completed,
                         item.learning_profile_certificate_path,
-                        editButton
+                        editButton,
+                        removeButton
 
                     ];
                 });
@@ -98,7 +100,7 @@ export default class learningProfile extends Component {
                             <h2 className="tableTitle" >{this.state.componentTitle} </h2>
                         </div>
                         <div className="learningTable">
-                            <Table {...this.state} editTraining={this.editTrainingRecord.bind(this)} className="learningTable" />
+                            <Table {...this.state} editTraining={this.editTrainingRecord.bind(this)} removeTraining={this.removeTrainingRecord.bind(this)} className="learningTable" />
 
                         </div>
                     </div>
@@ -110,6 +112,57 @@ export default class learningProfile extends Component {
     editTrainingRecord(trainingId) {
         console.log("Edit training Record" + trainingId)
         window.location.href = "/learning-profile-edit/" + trainingId
+    }
+
+    removeTrainingRecord(trainingId) {
+        console.log("Remove training Record" + trainingId);
+        const userId = JSON.parse(localStorage.getItem('tokens'))['user_id'];
+        let deleteRes = {};
+        var data = this.state.profileData;
+        const requestOptions =
+        {
+            method: 'DELETE',
+            url: 'http://localhost:3001/learning-profile-delete',
+            body:
+                JSON.stringify({
+                    userId,
+                    trainingId,
+                    data
+                }),
+
+            headers: {
+
+                'Content-Type': 'application/json',
+            },
+        }
+
+        fetch('http://localhost:3001/learning-profile-delete',
+            requestOptions)
+            .then(res => {
+                console.log(res.status);
+                if (res.status === 200) { return res.json(); }
+
+                throw `Invalid Query`
+            })
+            .then(data => {
+                console.log("/learning-profile-delete " + JSON.stringify(data))
+
+                deleteRes = {
+                    message: data.message,
+                }
+                console.log("addRes ", deleteRes)
+                return deleteRes;
+
+            }).catch(e => {
+                this.setState({ IsError: true })
+            });
+
+        setTimeout(() => {
+            alert(JSON.stringify(deleteRes, null, 2));
+
+        }, 400)
+        window.location.reload(true);
+
     }
 
 }

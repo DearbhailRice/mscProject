@@ -192,7 +192,7 @@ export default class Training extends Component {
 
             // setSubmitting(false);
         }, 400)
-
+        window.location.reload(true);
     }
 
 
