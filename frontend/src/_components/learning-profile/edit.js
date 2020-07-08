@@ -23,10 +23,12 @@ export default class LearningInfoEdit extends Component {
             isError: false,
             originUrl: "/personal-profile",
             trainingId: props.match.params.trainingId,
-            userId: JSON.parse(localStorage.getItem('tokens'))['user_id']
-
+            userId: JSON.parse(localStorage.getItem('tokens'))['user_id'],
+            editRes: {}
         }
-
+        if (!localStorage.tokens) {
+            window.location.href = "/login"
+        }
         this.handleDataUpdate = this.handleDataUpdate.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
 
@@ -81,20 +83,6 @@ export default class LearningInfoEdit extends Component {
                 })
 
             }
-            // (e.target.files[0]);
-            //     reader.addEventListener("load", (...args) => {
-
-            //         // value = JSON.stringify(reader.result);
-            //         const array = new Uint8Array(reader.result);
-            //         const stringArray = String.fromCharCode.apply(null, array);
-            //         value = stringArray;
-            //         console.log(ObjToUpdate, " OBJECT UPDATED")
-            //         ObjToUpdate[key] = value;
-            //         this.setState({
-            //             profileData: ObjToUpdate
-            //         })
-            //     })
-            //     reader.readAsArrayBuffer(file);
 
         }
 
@@ -112,7 +100,7 @@ export default class LearningInfoEdit extends Component {
     handleSubmit() {
 
         console.log("Handle submit ", this.state.profileData);
-        let editRes = {};
+
         var userId = this.state.userId;
         var trainingId = this.state.trainingId;
         var data = this.state.profileData;
@@ -132,31 +120,42 @@ export default class LearningInfoEdit extends Component {
                 'Content-Type': 'application/json',
             },
         }
-
-        console.log(requestOptions)
-
+        // debugger
         fetch('http://localhost:3001/learning_profile_edit',
             requestOptions)
             .then(res => res.json())
             .then(data => {
-                console.log("/learning-profile-edit " + JSON.stringify(data))
+                console.log("/login push response " + JSON.stringify(data))
 
-                editRes = {
+                let editResObj = {
                     message: data.message,
-
+                    sucessfulEdit: data.sucessfulEdit
                 }
 
-                return editRes;
+                console.log("edit res ", editResObj)
+
+                this.setState({
+                    editRes: editResObj
+                })
+
+                return editResObj;
             }).catch(e => {
-                this.setState({ IsError: true })
+                console.log("error", e)
+                this.setState({ IsError: true });
             });
+
         setTimeout(() => {
-            alert(JSON.stringify(editRes, null, 2));
+            alert(JSON.stringify(this.editRes, null, 2));
 
 
         }, 400)
 
+        window.location.href = "/learning-profile";
+
     }
+
+
+
     render() {
 
         return (

@@ -177,7 +177,7 @@ export default class Form extends Component {
                 <div className="formDiv">
                     <fieldset className="fieldset">
 
-                        <form id="formWrapper" enctype="multipart/form-data">
+                        <form id="formWrapper" encType="multipart/form-data">
 
 
 

@@ -125,6 +125,7 @@ export default class PersonalInfoEdit extends Component {
         let editRes = {};
         var userId = this.state.userId;
         var data = this.state.profileData;
+        console.log(data);
         const requestOptions =
         {
             method: 'POST',

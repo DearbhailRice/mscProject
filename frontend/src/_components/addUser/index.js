@@ -19,7 +19,6 @@ export default class AddUser extends Component {
                 "Role": "",
                 "Admin User Privilages": 0
             },
-            formElementLable: ["Name", "Work Email", "Start Date", "Staff Number", "Current Trust Employee", "Role", "Admin User Privilages"],
             componentTitle: "Add User ",
             inputType: ["text", "email", "date", "number", "radio", "option", "radio"],
             data: {},
@@ -38,6 +37,7 @@ export default class AddUser extends Component {
         let roleObj = {};
         let caObj = {};
         let combineArr = [];
+
         if (!localStorage.tokens) {
             window.location.href = "/login"
         }

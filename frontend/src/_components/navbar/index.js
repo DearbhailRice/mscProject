@@ -23,9 +23,9 @@ export default class Navbar extends Component {
             <div className="navbar">
                 <header className="header">
                     <div className="logo">
-                        <Route to={'/login'}>
+                        <a onClick={() => { window.location.href = "/" }}>
                             <img width="100%" src={Logo} alt="logo" />
-                        </Route>
+                        </a>
                     </div>
                     <div className="navComponents">
                         <ul>

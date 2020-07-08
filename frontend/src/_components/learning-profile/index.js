@@ -10,7 +10,7 @@ export default class learningProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            columnHearder: ["Training Id", "Training Title", "Valid for (years)", "Mandatory", "Duration (Hours)", "Completion Date", "Certificate", "Edit", "Remove"],
+            columnHearder: ["Training Id", "Training Title", "Valid for (years)", "Mandatory", "Duration (Hours)", "Completion Date", "Certificate", "valid", "Edit", "Remove"],
             rowData: [[]],
             redirectURL: "/learning-profile",
             componentTitle: "Learning Profile ",
@@ -27,7 +27,15 @@ export default class learningProfile extends Component {
         console.log("Modal CLOSE")
         this.setState({ isModalOpen: false })
     }
-
+    isBeforeInvalidDate(date, yearsValid) {
+        console.log("in date before today method ")
+        date = new Date(date);
+        var inValidDate = date.setFullYear(date.getFullYear() + yearsValid);
+        var today = new Date((new Date()).toString().substring(0, 15));
+        console.log("today= ", inValidDate, "date= ", date)
+        date = new Date(date)
+        return inValidDate < today;
+    }
 
 
     componentWillMount() {
@@ -35,6 +43,10 @@ export default class learningProfile extends Component {
         const userId = JSON.parse(localStorage.getItem('tokens'))['user_id'];
         let editButton = "editButton";
         let removeButton = "removeButton";
+        const VALID = "Valid"
+        const INVALID = "Invalid"
+        let isValid = VALID;
+
 
         fetch("http://localhost:3001/learning-profile-select" + userId)
             .then(res => {
@@ -43,9 +55,10 @@ export default class learningProfile extends Component {
                 throw `Invalid Query`
             })
             .then(dbres => {
-
+                console.log("DATE ", new Date(new Date().toDateString()))
 
                 tableArray = dbres.map(item => {
+
                     if (item.training_mandatory == 1) {
                         console.log(item.training_mandatory, " YES")
                         item.training_mandatory = "Yes"
@@ -56,9 +69,16 @@ export default class learningProfile extends Component {
 
                     if (item.learning_profile_date_completed == null) {
                         item.learning_profile_date_completed = "TBC";
+                        isValid = INVALID;
                     }
                     else {
+                        console.log(new Date(new Date().toDateString()), "      ", new Date(new Date().toDateString()))
+
+                        if (this.isBeforeInvalidDate(item.learning_profile_date_completed, item.training_revalidation_period_years)) {
+                            isValid = INVALID;
+                        }
                         item.learning_profile_date_completed = moment(item.learning_profile_date_completed).format("DD-MM-YY")
+
                     }
                     if (item.learning_profile_certificate_path == null || item.learning_profile_certificate_path == "") {
                         item.learning_profile_certificate_path = "TBC";
@@ -71,6 +91,7 @@ export default class learningProfile extends Component {
                         item.training_duration,
                         item.learning_profile_date_completed,
                         item.learning_profile_certificate_path,
+                        isValid,
                         editButton,
                         removeButton
 

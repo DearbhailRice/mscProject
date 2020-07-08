@@ -15,8 +15,8 @@ import Reset from "./_components/reset";
 import training from "./_components/training";
 import trainingAdd from "./_components/training/add";
 import learningProfileEdit from "./_components/learning-profile/edit";
-import Welcome from "./_components/welcome"
-
+import Welcome from "./_components/welcome";
+import NotFoundPage from "./_components/NotFoundPage";
 function App(props) {
 
   const existingTokens = JSON.parse(localStorage.getItem("tokens"));
@@ -51,6 +51,7 @@ function App(props) {
           <PrivateRoute path="/logout" component={Logout} />
           <PrivateRoute path="/adduser" component={AddUser} />
           <PrivateRoute path="/personal-profile/add" component={personalProfileAdd} />
+          <Route path="*" component={NotFoundPage} />
         </Switch>
       </AuthContext.Provider>
     </div>

@@ -769,26 +769,27 @@ app.post('/learning_profile_edit', upload.single('Certificate Upload'), (req, re
   var fileName = payload.data["Certificate Upload"];
   console.log("FileName", fileName)
   let message = "";
+  let sucessfulEdit = false;
 
 
 
-  console.log(`UPDATE msc_project.learning_profile SET learning_profile_certificate_path='${fileName}',learning_profile_date_completed= ${trainingDateComplete} WHERE learning_profile.learning_profile_training_id= ${trainingId} AND learning_profile.learning_profile_user_id= ${userId}`)
-  connection.query(`UPDATE msc_project.learning_profile SET learning_profile_certificate_path='${fileName}',learning_profile_date_completed= ${trainingDateComplete} WHERE learning_profile.learning_profile_training_id= ${trainingId} AND learning_profile.learning_profile_user_id= ${userId};`
+  console.log(`UPDATE msc_project.learning_profile SET learning_profile_certificate_path='${fileName}',learning_profile_date_completed=' ${trainingDateComplete}' WHERE learning_profile.learning_profile_training_id= ${trainingId} AND learning_profile.learning_profile_user_id= ${userId}`)
+  connection.query(`UPDATE msc_project.learning_profile SET learning_profile_certificate_path='${fileName}',learning_profile_date_completed= STR_TO_DATE('${trainingDateComplete}', '%Y-%m-%d') WHERE learning_profile.learning_profile_training_id= ${trainingId} AND learning_profile.learning_profile_user_id= ${userId};`
     , function (error, results) {
-
-      if (error) throw error;
-
+      if (error) {
+        message = "error occured  "
+        sucessfulEdit = false;
+        throw error
+      };
       message = "Added "
+      sucessfulEdit = true;
 
       const responseObj = {
         message: message,
-
+        sucessfulEdit: sucessfulEdit
       }
-      console.log(responseObj)
+      console.log("response obj ", responseObj)
       return res.json(responseObj)
-
-
-
     })
 })
 

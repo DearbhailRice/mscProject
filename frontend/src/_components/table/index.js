@@ -53,6 +53,16 @@ export default class Table extends Component {
                                     <tr>
 
                                         {dataRow.map(cellData => {
+
+                                            if (cellData == "Invalid") {
+                                                console.log("in date if ")
+                                                return <td style={{ color: "red" }}> {cellData}</td>
+                                            } else if (cellData == "Valid") {
+                                                console.log("in date if ")
+                                                return <td style={{ color: "green" }}> {cellData}</td>
+                                            }
+
+                                            // console.log("skipped date if ")
                                             if (typeof (cellData) == "string" && cellData.includes("data:")) {
                                                 certImg = cellData;
                                                 return <img className="certificateImage " src={cellData} onClick={e => { e.stopPropagation(); this.openModal() }} />
