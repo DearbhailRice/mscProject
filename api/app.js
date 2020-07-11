@@ -258,7 +258,8 @@ app.route("/add-user").post(function (req, res) {
           }
 
           connection.query(
-            `INSERT INTO msc_project.user (user_id, user_name, user_email_address, user_start_date, user_bank_staff_number, user_current_trust_employee_in_current_role, user_role_id_fk,user_admin) VALUES (NULL, "${name}", "${workEmail}" ,"${startDate}" , ${staffNumber}, ${curentTrustEmployee},${roleId}, ${userAdmin});`,
+            `INSERT INTO msc_project.user (user_id, user_name, user_email_address, user_start_date, user_bank_staff_number, user_current_trust_employee_in_current_role, user_role_id_fk,user_admin) VALUES (NULL, "
+            ${name}", "${workEmail}" ,"${startDate}" , ${staffNumber}, ${curentTrustEmployee},${roleId}, ${userAdmin});`,
 
             function (error, results, feilds) {
               if (error) {
@@ -343,6 +344,7 @@ app.route("/add-user").post(function (req, res) {
     res.json(responseObj)
   }
 });
+
 
 app.route("/forgottenPassword_push").post(function (req, res) {
 
