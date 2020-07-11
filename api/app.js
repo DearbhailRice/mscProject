@@ -15,7 +15,8 @@ var testdbRouter = require("./routes/test")
 const nodemailer = require("nodemailer");
 var multer = require('multer')
 var upload = multer({ dest: 'uploads/' })
-
+const key = "mscProject";
+const AES = require('mysql-aes');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -102,7 +103,8 @@ app.route("/login_select:user_email").get(function (req, res) {
   console.log("in  api");
   console.log("user_email " + req.params.user_email)
   connection.query(
-    "SELECT user_id, user_email_address, password_text FROM `user` INNER Join password on user_id= password_user_id where user_email_address = ?;",
+    ` SELECT user_id, user_admin, user_email_address, AES_DECRYPT(password_text,"mscProject" ) FROM user INNER Join password on user_id= password_user_id where user_email_address = ?;`,
+    // `SELECT user_id, user_email_address, AES_DECRYPT(password_text,${JSON.stringify(key)}) FROM user INNER Join password on user_id= password_user_id where user_email_address = ?;`,
     req.params.user_email,
     function (error, results, feilds) {
       console.log("Error " + error)
@@ -135,15 +137,16 @@ app.route("/login_push").post(function (req, res) {
   var user_admin = false;
   console.log("user_email " + user_email)
 
-
+  console.log(`SELECT user_id, user_admin, user_email_address,  AES_Decrypt(password_text,"${key}") FROM user INNER Join password on user_id= password_user_id where user_email_address = "${user_email}" AND  AES_Decrypt(password_text,"${key}")= "${user_password}";`)
   connection.query(
-    "SELECT user_id, user_admin, user_email_address, password_text FROM `user` INNER Join password on user_id= password_user_id where user_email_address = ?;",
+    `SELECT user_id, user_admin, user_email_address,  AES_Decrypt(password_text,"${key}") FROM user INNER Join password on user_id= password_user_id where user_email_address = "${user_email}" AND  AES_Decrypt(password_text,"${key}")= "${user_password}";`,
     user_email,
     function (error, results, feilds) {
       console.log("Error " + error)
       console.log("results ", results)
-      user_id = results[0].user_id;
       if (results < 1) {
+        console.log("results<1")
+        user_id = results[0].user_id;
         console.log("results < 1 " + results)
         message = "email " + user_email + " or password are incorrect";
       }
@@ -152,19 +155,19 @@ app.route("/login_push").post(function (req, res) {
         throw error;
       }
       else {
-
         console.log("db results " + JSON.stringify(results))
         console.log(" results.user_email_address " + results[0].user_email_address)
         console.log("userID ", results[0].user_id)
+        message = "email and password match";
+        isCorrectLogin = true;
+        // if ((user_email == results[0].user_email_address) && (user_password == results[0].password_text)) {
+        //   message = "email and password match";
+        //   isCorrectLogin = true;
+        // }
+        // else {
+        //   message = "username and password do not match";
 
-        if ((user_email == results[0].user_email_address) && (user_password == results[0].password_text)) {
-          message = "email and password match";
-          isCorrectLogin = true;
-        }
-        else {
-          message = "username and password do not match";
-
-        }
+        // }
         console.log("results[0].user_admin" + results[0].user_admin)
         if (results[0].user_admin === 1) {
           user_admin = true;
@@ -255,7 +258,7 @@ app.route("/add-user").post(function (req, res) {
           }
 
           connection.query(
-            "INSERT INTO `msc_project`.`user` (`user_id`, `user_name`, `user_email_address`, `user_start_date`, `user_bank_staff_number`, `user_current_trust_employee_in_current_role`, `user_role_id_fk`,`user_admin`) VALUES (NULL, " + JSON.stringify(name) + ", " + JSON.stringify(workEmail) + "," + startDate + ", " + staffNumber + ", " + curentTrustEmployee + "," + roleId + ", " + userAdmin + ");",
+            `INSERT INTO msc_project.user (user_id, user_name, user_email_address, user_start_date, user_bank_staff_number, user_current_trust_employee_in_current_role, user_role_id_fk,user_admin) VALUES (NULL, ${name}, ${workEmail} ,${startDate} , ${staffNumber}, ${curentTrustEmployee},${roleId}, ${userAdmin});`,
 
             function (error, results, feilds) {
               if (error) {
@@ -302,9 +305,9 @@ app.route("/add-user").post(function (req, res) {
                       to: workEmail,
                       subject: "password reset request for Northern HSCT e-learning platform  ",
                       text:
-                        "a password reset request has been made for this email if this was you please click the following link: \n\n" +
+                        "an account has been created for you, please follow the link bellow to create a password for you account \n\n" +
                         "http://localhost:3000/reset/" + token + "/" + userId + "\n\n" +
-                        "if this reset was not you pklease ignore this email "
+                        "Please complete your porfile at your earliest convience  "
                     };
 
                     transporter.sendMail(mailOptions, function (err, response) {
@@ -582,20 +585,20 @@ app.route("/personal-profile-add").post(async function (req, res) {
 
           console.log("roleId ", roleId)
           console.log("clinicalAreaId", clinicalAreaId)
-          console.log("START TRANSACTION; UPDATE msc_project.user SET user_name= " + JSON.stringify(name) + ", user_current_trust_employee_in_current_role="
-            + curentTrustEmployee + ", user_role_id_fk= 1  WHERE user_id = " + userId
-            + "; INSERT INTO address (address_user_id , address_line_1 , address_line_2 , address_line_3, address_postcode, address_town , address_county ) VALUES("
-            + userId + ", " + JSON.stringify(address1) + ", " + JSON.stringify(address2) + ", " + JSON.stringify(address3) + ", " + JSON.stringify(postcode) + ", "
-            + JSON.stringify(town) + "," + JSON.stringify(county) + " ); SELECT @addressId:=address_id From address WHERE address_user_id=" + userId
-            + "; INSERT INTO contact_details (contact_details_user_id ,contact_details_tel_number ,contact_details_personal_email ,contact_details_preffer_personal_email_contact ,contact_details_address_id ) VALUES ("
-            + userId + "," + JSON.stringify(telNum) + ", " + JSON.stringify(personalEmail) + "," + contactPersonalEmail + ",@addressId);"
+          console.log("UPDATE `msc_project`.`user` SET  user_name= " + JSON.stringify(name) + ", user_current_trust_employee_in_current_role=" + curentTrustEmployee + ", user_role_id_fk= " + roleId + "  WHERE user_id = " + userId + ";"
+            + " INSERT INTO address (address_user_id , address_line_1 , address_line_2 , address_line_3, address_postcode, address_town , address_county )"
+            + " VALUES(" + userId + ", " + JSON.stringify(address1) + ", " + JSON.stringify(address2) + ", " + JSON.stringify(address3) + ", " + JSON.stringify(postcode) + ", " + JSON.stringify(town) + "," + JSON.stringify(county) + " );"
+
+            + "SELECT @addressId:=address_id From address WHERE address_user_id=" + userId + ";"
+
+            + "INSERT INTO contact_details (contact_details_user_id ,contact_details_tel_number ,contact_details_personal_email ,contact_details_preffer_personal_email_contact ,contact_details_address_id )"
+            + " VALUES (" + userId + "," + JSON.stringify(telNum) + ", " + JSON.stringify(personalEmail) + "," + contactPersonalEmail + ",@addressId);"
 
             + "INSERT INTO emergency_contact_details (emergency_contact_details_user_id ,emergency_contact_details_name, emergency_contact_details_tel_number, emergency_contact_details__relationship)"
             + "VALUES(" + userId + ", " + JSON.stringify(emergencyConName) + "," + JSON.stringify(emergencyConTel) + ", " + JSON.stringify(emergencyConRelationship) + " );"
 
             + " INSERT INTO clinical_area_to_user_lookup (clinical_area_to_user_lookup_clinical_area_id, clinical_area_to_user_lookup_user_id )"
-            + " VALUES(" + roleId + "," + userId + ");"
-            + "COMMIT;")
+            + " VALUES(" + roleId + "," + userId + ");")
 
 
 
@@ -624,7 +627,7 @@ app.route("/personal-profile-add").post(async function (req, res) {
                 sucessfulAdd = true;
               }
               const responseObj = {
-                userId: data.userId,
+                userId: userId,
                 message: message,
                 sucessfulAdd: sucessfulAdd
               }
@@ -646,16 +649,18 @@ app.route("/reset_password_push").post(function (req, res) {
   var userId = payload.userId;
   var password = payload.data["password1"];
 
-  connection.query("SELECT * FROM `password` WHERE `password`.`password_user_id` = " + userId + ";"
+  connection.query(`SELECT *, AES_Decrypt(password_text,"${key}" ) FROM password WHERE password.password_user_id =  ${userId};`
     , function (error, results, feilds) {
-      console.log(results.length + " results ")
+      // console.log(results.length + " results ")
       if (error) {
         console.log("Error " + error)
         message = error;
       } else if (results.length === 0) {
         console.log("No user in password table ")
-
-        connection.query("INSERT INTO `msc_project`.`password` (`password_id`, `password_user_id`, `password_text`, `password_previous_text`, `password_date`) VALUES (NULL, " + userId + ", " + JSON.stringify(password) + ", NULL, NULL);"
+        //Insert INTO password (password_text,password_user_id) VALUES (AES_ENCRYPT("password", "mscProject"), 1)
+        //Insert INTO password (password_text,password_user_id) VALUES ("${password}", "${key}"), ${userId})
+        connection.query(`Insert INTO password (password_text,password_user_id) VALUES (AES_ENCRYPT("${password}", "${key}"), ${userId});`
+          // `INSERT INTO msc_project.password (password_id, password_user_id, password_text, password_previous_text, password_date) VALUES (NULL, ${userId} , AES_ENCRYPT("${password}", "${key}") , NULL, NULL);`
           , function (error, caresults, feilds) {
             if (error) {
               console.log("Error " + error)
@@ -674,7 +679,7 @@ app.route("/reset_password_push").post(function (req, res) {
           })
       } else {
         console.log("in else update password")
-        connection.query("UPDATE `msc_project`.`password` SET `password_text` = " + JSON.stringify(password) + " WHERE `password`.`password_user_id` = " + userId + ";"
+        connection.query(`UPDATE msc_project.password SET password_text =   AES_ENCRYPT("${password}", "${key}")  WHERE password.password_user_id =  ${userId};`
           , function (error, caresults, feilds) {
             if (error) {
               console.log("Error " + error)

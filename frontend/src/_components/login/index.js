@@ -5,10 +5,6 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import "../../styles/login/login.scss"
 import { useAuth } from "../../context/auth";
 
-
-
-
-
 function Login(props) {
     let redirectVar = "/personal-profile";
     const [isLoggedIn, setLoggedIn] = useState(false);
@@ -16,8 +12,6 @@ function Login(props) {
     const { setAuthTokens } = useAuth();
     const { state } = props.location;
     const referer = (state) ? props.location.state.referer || redirectVar : redirectVar;
-
-
     let loginRes = {};
 
     if (isLoggedIn) {
@@ -25,9 +19,6 @@ function Login(props) {
     }
 
     const handleSubmit = (values, { setSubmitting }) => {
-
-
-
         const user_email = values.email;
         const user_password = values.password;
         console.log("user_email frontend " + user_email);
@@ -47,13 +38,11 @@ function Login(props) {
             },
         }
 
-
         fetch('http://localhost:3001/login_push',
             requestOptions)
             .then(res => res.json())
             .then(data => {
                 console.log("/login push response " + JSON.stringify(data))
-
                 loginRes = {
                     user_id: data.user_id,
                     message: data.message,
@@ -85,21 +74,15 @@ function Login(props) {
 
     return (
         <div className="loginPage" >
-
             {console.log("on login page ")}
             < Navbar />
-
             <div className="loginComponent">
                 <div className="loginTitle">
                     <h1>Login</h1>
                 </div>
-
                 <div className="loginForm">
-
                     <Formik
-
                         initialValues={{ email: '', password: '' }}
-
                         validate={values => {
                             const errors = {};
                             if (!values.email) {
@@ -109,7 +92,6 @@ function Login(props) {
                             ) {
                                 errors.email = 'Invalid email address';
                             }
-
 
                             if (!values.password) {
                                 errors.password = "Password Required";
@@ -124,7 +106,6 @@ function Login(props) {
                             }
                             return errors;
                         }}
-
                         onSubmit={handleSubmit}
                     >
                         {({ isSubmitting }) => (
@@ -145,11 +126,9 @@ function Login(props) {
                         )}
                     </Formik>
                 </div>
-
             </div>
         </div >
     )
-
 }
 export default Login;
 

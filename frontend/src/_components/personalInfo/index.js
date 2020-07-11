@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import "../../styles/personalInfo/personalInfo.scss";
 
-
 export default class PersonalInfo extends Component {
     constructor(props) {
         super(props);
@@ -10,16 +9,12 @@ export default class PersonalInfo extends Component {
         }
     }
 
-
     render() {
         if (!this.props.profileData) {
             console.log("profiledata " + this.props.profileData)
-
             return window.location.href = "/personal-profile/add"
-
         } else {
             console.log(Object.keys(this.props.profileData))
-
             return (
                 <table className="tableWrapper">
                     <tbody>
@@ -29,16 +24,12 @@ export default class PersonalInfo extends Component {
                                 <td> <p className="dataElement" > {this.props.profileData[headerName]}</p></td>
                             </tr>
                         })}
-
-
                     </tbody>
                 </table>
-
-
-
             );
         }
     }
+
     redirect() {
         this.props.history.push({
             pathname: this.state.redirectURL,

@@ -1,14 +1,22 @@
 /*table syles*/
-
+.tableWrapper{
+  max-width: 80%;
+}
+.wrapper{
+  width: 100%;
+  margin: 10px;
+}
 .table{
-    border-radius: 5px;
+  
     font-size: 12px;
     font-weight: normal;
-    border: none;
-    border-collapse: collapse;
     width: 100%;
     max-width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
     white-space: nowrap;
+    overflow-x:auto;
+   
 }
 .captionDiv{
     display: inline-flex;
@@ -42,11 +50,12 @@
     color: rgba(0, 0, 0, 0.623)
 }
 
-@media(max-width: 750px){
+@media(max-width: 1000px){
 
 .table{
     display: block;
     width: 100%;
+    
 }
 
 .tableWrapper:before{

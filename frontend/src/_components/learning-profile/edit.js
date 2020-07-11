@@ -34,12 +34,6 @@ export default class LearningInfoEdit extends Component {
 
     }
 
-
-    componentWillMount() {
-
-
-
-    }
     validate(key, value, ObjToUpdate) {
         let error = {}
         this.setState({ validateError: null });
@@ -47,7 +41,6 @@ export default class LearningInfoEdit extends Component {
         console.log("key ", key);
         if ((key == "Address Line 2") || (key == "Address Line 3")) {
             console.log("not address1")
-
 
         } else if (!value) {
             error = key + ' Required';
@@ -63,12 +56,9 @@ export default class LearningInfoEdit extends Component {
                 validateError: error
             })
         }
-
         console.log("error ", error)
-
-
-
     }
+
     handleDataUpdate(key, value, e) {
         console.log("key ", key)
         let ObjToUpdate = this.state.profileData
@@ -81,24 +71,19 @@ export default class LearningInfoEdit extends Component {
                 this.setState({
                     profileData: ObjToUpdate
                 })
-
             }
-
         }
-
-
-
         console.log(ObjToUpdate, " OBJECT UPDATED")
         ObjToUpdate[key] = value;
 
         this.validate(key, value, ObjToUpdate)
+
         this.setState({
             profileData: ObjToUpdate
         })
     }
 
     handleSubmit() {
-
         console.log("Handle submit ", this.state.profileData);
 
         var userId = this.state.userId;
@@ -120,7 +105,7 @@ export default class LearningInfoEdit extends Component {
                 'Content-Type': 'application/json',
             },
         }
-        // debugger
+
         fetch('http://localhost:3001/learning_profile_edit',
             requestOptions)
             .then(res => res.json())
@@ -146,18 +131,12 @@ export default class LearningInfoEdit extends Component {
 
         setTimeout(() => {
             alert(JSON.stringify(this.editRes, null, 2));
-
-
         }, 400)
 
         window.location.href = "/learning-profile";
-
     }
 
-
-
     render() {
-
         return (
             <div className="personalProfile" >
                 <Navbar />
@@ -167,15 +146,10 @@ export default class LearningInfoEdit extends Component {
                         <div>
                             <h2 className="tableTitle">{this.state.componentTitle} </h2>
                         </div>
-
                         <Form {...this.state} onSubmit={this.handleSubmit} onChange={this.handleDataUpdate} />
-
                     </div>
                 </div>
-
             </div>
-
-
         );
     }
 }

@@ -4,7 +4,6 @@ import Table from "../../_components/table";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import "../../styles/learningProfile/learningProfile.scss";
-import moment from "moment"
 export default class Training extends Component {
     constructor(props) {
         super(props);
@@ -17,7 +16,6 @@ export default class Training extends Component {
         }
     }
 
-
     componentWillMount() {
         let tableArray = [];
         let disableArray = [];
@@ -26,8 +24,6 @@ export default class Training extends Component {
         var trainingId = 0;
         const userId = JSON.parse(localStorage.getItem('tokens'))['user_id'];
         var addButtonShown = "";
-        // const userId = 1;
-
 
         fetch("http://localhost:3001/training_disable" + userId)
             .then(res => {
@@ -37,14 +33,9 @@ export default class Training extends Component {
             })
             .then(dbres => {
                 disableArray = dbres.map(item => {
-
                     return item.learning_profile_training_id
-
-
                 });
                 console.log("disableArray array" + JSON.stringify(disableArray, null, 4));
-                //match exising id to training id and disable add button if match found 
-                let existingProfileId = disableArray
 
                 fetch("http://localhost:3001/training-select")
                     .then(res => {
@@ -55,8 +46,6 @@ export default class Training extends Component {
                     .then(dbres => {
                         tableArray = dbres.map(item => {
                             trainingId = item.trainingId;
-                            //h:mm:
-
                             if (disableArray.includes(item.training_id)) {
                                 console.log(disableArray);
                                 console.log(item.training_id)
@@ -72,9 +61,7 @@ export default class Training extends Component {
                             } else {
                                 console.log(item.training_mandatory, " NO")
                                 item.training_mandatory = "No"
-
                             }
-
                             if (item.training_course_face_to_face == 1) {
                                 console.log(item.ttraining_course_face_to_face, " YES")
                                 item.training_course_face_to_face = "Yes"
@@ -83,8 +70,6 @@ export default class Training extends Component {
                                 item.training_course_face_to_face = "No"
 
                             }
-
-                            // item.training_duration = moment(item.training_duration).format("hh:mm")
                             return [
                                 item.training_id,
                                 item.training_title,
@@ -94,22 +79,16 @@ export default class Training extends Component {
                                 item.training_version_number,
                                 item.training_duration,
                                 addButtonShown
-
                             ];
                         });
                         console.log("table array" + JSON.stringify(tableArray, null, 4));
-
                         this.setState({
                             rowData: tableArray
                         })
                     }).catch(err => {
                         alert(err);
                     })
-
             })
-
-
-
     }
 
     render() {
@@ -124,7 +103,6 @@ export default class Training extends Component {
             <div className="learningProfile">
                 {console.log("on learning-profile page ")}
                 <Navbar />
-
                 <div className="learningInfo">
                     <div className="wrapperDiv">
                         <div className="captionDiv">
@@ -136,11 +114,9 @@ export default class Training extends Component {
                         </div>
                         <div className="learningTable">
                             <Table {...this.state} addTraining={this.addTraining.bind(this)} className="learningTable" />
-
                         </div>
                     </div>
                 </div>
-
             </div>
         )
     }
@@ -150,7 +126,6 @@ export default class Training extends Component {
             trainingId: trainingId
         })
         let trainRes = {};
-
         let user = JSON.parse(localStorage.getItem('tokens'))['user_id'];
         console.log("user Id ", user)
         const requestOptions =
@@ -166,21 +141,16 @@ export default class Training extends Component {
             },
         }
         console.log("request options ", requestOptions)
-
         console.log("addTrining ", trainingId)
-
 
         fetch('http://localhost:3001/learning_profile_add',
             requestOptions)
             .then(res => res.json())
             .then(data => {
-
                 console.log("/login push response " + JSON.stringify(data))
-
                 trainRes = {
                     message: data.message,
                 }
-
                 return trainRes;
             }).catch(e => {
                 console.log("error training")
@@ -189,11 +159,7 @@ export default class Training extends Component {
         setTimeout(() => {
             alert(JSON.stringify(trainRes, null, 2));
             console.log("resetRes.passwordReset", trainRes.message)
-
-            // setSubmitting(false);
         }, 400)
         window.location.reload(true);
     }
-
-
 }

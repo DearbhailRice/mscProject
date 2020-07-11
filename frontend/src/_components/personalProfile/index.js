@@ -29,23 +29,19 @@ export default class personalProfile extends Component {
             }).then(dbres => {
                 profileArray = dbres.map(item => {
 
-
                     if (item.contact_details_preffer_personal_email_contact === 1) {
                         console.log("in profileArray item.contact_details_preffer_personal_email_contact if yes")
                         item.contact_details_preffer_personal_email_contact = "Yes";
                         console.log(" item.contact_details_preffer_personal_email_contact" + item.contact_details_preffer_personal_email_contact)
-
                     } else {
                         item.contact_details_preffer_personal_email_contact = "No";
                         console.log("in profileArray item.contact_details_preffer_personal_email_contact if No")
                         console.log(" item.contact_details_preffer_personal_email_contact" + item.contact_details_preffer_personal_email_contact)
                     }
-
                     if (item.user_current_trust_employee_in_current_role === 1) {
                         console.log("in profileArray item.user_current_trust_employee_in_current_role if yes")
                         item.user_current_trust_employee_in_current_role = "Yes";
                         console.log(" item.user_current_trust_employee_in_current_role" + item.user_current_trust_employee_in_current_role)
-
                     } else {
                         item.user_current_trust_employee_in_current_role = "No";
                         console.log("in profileArray item.user_current_trust_employee_in_current_role if No")
@@ -57,8 +53,6 @@ export default class personalProfile extends Component {
                     if (item.address_line_3 == null) {
                         item.address_line_3 = " -- "
                     }
-
-
 
                     return {
                         "Name": item.user_name,
@@ -81,16 +75,12 @@ export default class personalProfile extends Component {
                         "Clinical Area": item.clinical_area_title,
                         "Role": item.role_title,
                         "Band": item.role_band_id
-
                     };
 
                 });
                 console.log("Profile array " + JSON.stringify(profileArray, null, 4));
-
                 this.setState({
-
                     profileData: profileArray[0]
-
                 })
             }).catch(err => {
                 alert(err);
@@ -101,25 +91,23 @@ export default class personalProfile extends Component {
             <div className="personalProfile" >
                 {console.log("on personal-profile page ")}
                 < Navbar />
-
                 <div className="personalProfileContent">
                     <div className="wrapperDiv">
                         <div>
                             <h2 className="tableTitle">{this.state.componentTitle} </h2>
-                            <a className="editButton" onClick={() => { this.setState({ isEdit: true }) }} >
-                                <FontAwesomeIcon className="editIcon" icon={faEdit} size="1x" style={{ margin: "19px" }} />
-                            </a>
+                            {(!this.state.isEdit) ?
+                                <a className="editButton" onClick={() => { this.setState({ isEdit: true }) }} >
+                                    <FontAwesomeIcon className="editIcon" icon={faEdit} size="1x" style={{ margin: "19px" }} />
+                                </a>
+                                : <div></div>
+                            }
                         </div>
-
-
                         <div className="personalInfoDiv">
-
                             {(!this.state.isEdit) ?
                                 <PersonalInfo {...this.state} className="personalInfo" />
                                 :
                                 <Edit {...this.state} />
                             }
-
                         </div>
                     </div>
                 </div>

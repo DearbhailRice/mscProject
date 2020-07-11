@@ -1,14 +1,13 @@
 import React, { Component, useImperativeHandle } from 'react';
 import "../../styles/personalInfo/personalInfo.scss";
 import Form from "../form";
-import Navbar from "../navbar";
 
 export default class PersonalInfoEdit extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            userId: 1,
+            userId: JSON.parse(localStorage.getItem('tokens'))['user_id'],
             options: [[]],
             columnHeader: this.props.columnHeader,
             profileData: this.props.profileData,
@@ -20,11 +19,9 @@ export default class PersonalInfoEdit extends Component {
             isError: false,
             originUrl: "/personal-profile"
         }
-
         this.handleDataUpdate = this.handleDataUpdate.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
-
 
     componentWillMount() {
         let optionsObj = [];
@@ -63,51 +60,48 @@ export default class PersonalInfoEdit extends Component {
                         option1: caEditItem.clinical_area_title,
                     };
                 });
-
                 combineArr.push(roleObj);
                 combineArr.push(caObj);
-
                 this.setState({
                     options: combineArr
                 })
-
             })
         }).catch(err => {
             alert(err);
         })
     }
+
     validate(key, value, ObjToUpdate) {
         let error = {}
+        let isError = false;
         this.setState({ validateError: null });
         console.log("value ", value);
         console.log("key ", key);
         if ((key == "Address Line 2") || (key == "Address Line 3")) {
             console.log("not address1")
-
-
         } else if (!value) {
             error = key + ' Required';
+            isError = true;
             if ((key == "Name") || (key == "Address Line 1") || (key == " ")) {
                 if (!/^/.test(ObjToUpdate[key])) {
                 }
             }
             if ((key == "Personal Email")) {
-
                 console.log("personal email changed ");
                 if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value)) {
                     error = key + ' Invalid';
+                    isError = true;
                 }
             }
             this.setState({
-                validateError: error
+                validateError: error,
+                isError: isError
             })
         }
 
         console.log("error ", error)
-
-
-
     }
+
     handleDataUpdate(key, value, e) {
         console.log("key ", key)
         let ObjToUpdate = this.state.profileData
@@ -120,11 +114,10 @@ export default class PersonalInfoEdit extends Component {
     }
 
     handleSubmit() {
-
         console.log("Handle submit ", this.state.profileData);
         let editRes = {};
         var userId = this.state.userId;
-        var data = this.state.profileData;
+        var data = this.props.profileData;
         console.log(data);
         const requestOptions =
         {
@@ -145,14 +138,13 @@ export default class PersonalInfoEdit extends Component {
         fetch('http://localhost:3001/personal-profile-edit',
             requestOptions)
             .then(res => res.json())
-            .then(data => {
-                console.log("/personal-profile-edit " + JSON.stringify(data))
+            .then(item => {
+                console.log("/personal-profile-edit " + JSON.stringify(item))
 
                 editRes = {
-                    message: data.message,
-                    sucessfulEdit: data.sucessfulEdit
+                    message: item.message,
+                    sucessfulEdit: item.sucessfulEdit
                 }
-
                 return editRes;
             }).catch(e => {
                 this.setState({ IsError: true })
@@ -163,21 +155,16 @@ export default class PersonalInfoEdit extends Component {
             if (editRes.sucessfulEdit) {
                 window.location.href = "/personal-profile"
             }
-
         }, 400)
-
     }
-    render() {
 
+    render() {
         return (
             <div className="personalProfile" >
                 {console.log("on personal-profile edit page ")}
-
-
                 < div className="editPersonalInfo" >
                     <Form {...this.state} onSubmit={this.handleSubmit} onChange={this.handleDataUpdate} />
-
-
+                    {console.log("IsError ", this.isError)}
                 </div>
             </div >
         );

@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import Navbar from "../../_components/navbar";
 import Table from "../../_components/table";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import "../../styles/learningProfile/learningProfile.scss";
-import ReactModal from "react-modal";
 import moment from "moment"
+
+/**
+ * class to display individual logged in users learning profile
+ */
 export default class learningProfile extends Component {
     constructor(props) {
         super(props);
@@ -15,18 +16,29 @@ export default class learningProfile extends Component {
             redirectURL: "/learning-profile",
             componentTitle: "Learning Profile ",
             isModalOpen: false
-
         }
     }
-
+    /**
+     * sets boolean for modal is open
+     */
     openModal() {
         console.log("Modal OPEN")
         this.setState({ isModalOpen: true })
     }
+    /**
+     * sets boolean for modal is closed
+     */
     closeModal() {
         console.log("Modal CLOSE")
         this.setState({ isModalOpen: false })
     }
+
+    /**
+     * function to calculate the completion date plus the valid for years 
+     * then check if the calculated date is before the date now 
+     * @param {*} date 
+     * @param {*} yearsValid 
+     */
     isBeforeInvalidDate(date, yearsValid) {
         console.log("in date before today method ")
         date = new Date(date);
@@ -37,7 +49,10 @@ export default class learningProfile extends Component {
         return inValidDate < today;
     }
 
-
+    /**
+     * retrieves the user id from local storage 
+     * fetches learning profile data from the api using the user id
+     */
     componentWillMount() {
         let tableArray = [];
         const userId = JSON.parse(localStorage.getItem('tokens'))['user_id'];
@@ -46,7 +61,6 @@ export default class learningProfile extends Component {
         const VALID = "Valid"
         const INVALID = "Invalid"
         let isValid = VALID;
-
 
         fetch("http://localhost:3001/learning-profile-select" + userId)
             .then(res => {
@@ -70,8 +84,7 @@ export default class learningProfile extends Component {
                     if (item.learning_profile_date_completed == null) {
                         item.learning_profile_date_completed = "TBC";
                         isValid = INVALID;
-                    }
-                    else {
+                    } else {
                         console.log(new Date(new Date().toDateString()), "      ", new Date(new Date().toDateString()))
 
                         if (this.isBeforeInvalidDate(item.learning_profile_date_completed, item.training_revalidation_period_years)) {
@@ -94,14 +107,10 @@ export default class learningProfile extends Component {
                         isValid,
                         editButton,
                         removeButton
-
                     ];
                 });
                 console.log("table array" + JSON.stringify(tableArray, null, 4));
-
-                //training_maditiory 
                 this.setState({
-
                     rowData: tableArray
                 })
             }).catch(err => {
@@ -114,27 +123,29 @@ export default class learningProfile extends Component {
             <div className="learningProfile">
                 {console.log("on learning-profile page ")}
                 <Navbar />
-
                 <div className="learningInfo">
                     <div className="wrapperDiv">
                         <div className="captionDiv">
                             <h2 className="tableTitle" >{this.state.componentTitle} </h2>
                         </div>
-                        <div className="learningTable">
-                            <Table {...this.state} editTraining={this.editTrainingRecord.bind(this)} removeTraining={this.removeTrainingRecord.bind(this)} className="learningTable" />
-
-                        </div>
+                        {/*  */}
+                        <Table {...this.state} editTraining={this.editTrainingRecord.bind(this)} removeTraining={this.removeTrainingRecord.bind(this)} className="learningTable" />
                     </div>
                 </div>
-
             </div >
         )
     }
+    /**
+     * redirects to edit training record page 
+     *  */
     editTrainingRecord(trainingId) {
         console.log("Edit training Record" + trainingId)
         window.location.href = "/learning-profile-edit/" + trainingId
     }
-
+    /**
+     * sends delete request to the api to remove training record fron the users learning profile 
+     * @param {*} trainingId 
+     */
     removeTrainingRecord(trainingId) {
         console.log("Remove training Record" + trainingId);
         const userId = JSON.parse(localStorage.getItem('tokens'))['user_id'];
@@ -150,7 +161,6 @@ export default class learningProfile extends Component {
                     trainingId,
                     data
                 }),
-
             headers: {
 
                 'Content-Type': 'application/json',
@@ -183,7 +193,5 @@ export default class learningProfile extends Component {
 
         }, 400)
         window.location.reload(true);
-
     }
-
 }

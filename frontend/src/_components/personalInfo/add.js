@@ -6,7 +6,6 @@ import Navbar from "../navbar";
 export default class AddUser extends Component {
     constructor(props) {
         super(props);
-
         this.state = {
             userId: JSON.parse(localStorage.getItem('tokens'))['user_id'],
             options: [[]],
@@ -29,7 +28,6 @@ export default class AddUser extends Component {
                 "Role": "",
                 "Band": 0
             },
-
             componentTitle: "Add Personal Profile ",
             inputType: ["text", "radio", "tel", "email", "radio", "text", "text", "text", "text", "text", "tel", "text", "tel", "text", "option", "option", "option"],
             data: {},
@@ -41,7 +39,6 @@ export default class AddUser extends Component {
         this.handleDataUpdate = this.handleDataUpdate.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
-
 
     componentWillMount() {
         let optionsObj = [];
@@ -80,19 +77,17 @@ export default class AddUser extends Component {
                         option1: caEditItem.clinical_area_title,
                     };
                 });
-
                 combineArr.push(roleObj);
                 combineArr.push(caObj);
-
                 this.setState({
                     options: combineArr
                 })
-
             })
         }).catch(err => {
             alert(err);
         })
     }
+
     validate(key, value, ObjToUpdate) {
         let error = {}
         this.setState({ validateError: null });
@@ -100,8 +95,6 @@ export default class AddUser extends Component {
         console.log("key ", key);
         if ((key == "Address Line 2") || (key == "Address Line 3")) {
             console.log("not address1")
-
-
         } else if (!value) {
             error = key + ' Required';
             if ((key == "Name") || (key == "Address Line 1") || (key == " ")) {
@@ -109,7 +102,6 @@ export default class AddUser extends Component {
                 }
             }
             if ((key == "Personal Email")) {
-
                 console.log("personal email changed ");
                 if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value)) {
                     error = key + ' Invalid';
@@ -119,12 +111,9 @@ export default class AddUser extends Component {
                 validateError: error
             })
         }
-
         console.log("error ", error)
-
-
-
     }
+
     handleDataUpdate(key, value, e) {
         console.log("key ", key)
         let ObjToUpdate = this.state.profileData
@@ -137,7 +126,6 @@ export default class AddUser extends Component {
     }
 
     handleSubmit() {
-
         console.log("Handle submit ", this.state.profileData);
         let addRes = {};
         var userId = this.state.userId;
@@ -178,12 +166,10 @@ export default class AddUser extends Component {
             if (addRes.sucessfulEdit) {
                 window.location.href = "/personal-profile"
             }
-
         }, 400)
-
     }
-    render() {
 
+    render() {
         return (
             <div className="personalProfile" >
                 <Navbar />
@@ -193,17 +179,10 @@ export default class AddUser extends Component {
                         <div>
                             <h2 className="tableTitle">{this.state.componentTitle} </h2>
                         </div>
-
                         <Form {...this.state} onSubmit={this.handleSubmit} onChange={this.handleDataUpdate} />
-
                     </div>
                 </div>
-
             </div>
-
-
-
-
         );
     }
 }

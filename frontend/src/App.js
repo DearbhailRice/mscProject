@@ -6,7 +6,6 @@ import personalProfile from './_components/personalProfile';
 import login from './_components/login';
 import personalProfileEdit from './_components/personalInfo/edit.js';
 import personalProfileAdd from './_components/personalInfo/add.js';
-import addUser from "./_components/addUser";
 import Logout from "./_components/logout";
 import { AuthContext } from "./context/auth";
 import PrivateRoute from './_components/privateRoute';
@@ -17,8 +16,8 @@ import trainingAdd from "./_components/training/add";
 import learningProfileEdit from "./_components/learning-profile/edit";
 import Welcome from "./_components/welcome";
 import NotFoundPage from "./_components/NotFoundPage";
-function App(props) {
 
+function App(props) {
   const existingTokens = JSON.parse(localStorage.getItem("tokens"));
 
   //imporovements: clear using date stamp? ?create date stamp obj to do this 
@@ -36,12 +35,11 @@ function App(props) {
       <AuthContext.Provider value={{ authTokens, setAuthTokens: setTokens }}>
         {console.log("in app div")}
         <Switch>
-          {console.log("in switch")}
-          {/* <PrivateRoute excat path="/add-user" componet={addUser} /> */}
           <Route exact path="/forgotPassword" component={forgotPassword} />
           <Route exact path="/login" component={login} />
           <Route exact path="/reset/:token/:userId" component={Reset} />
           <Route exact path="/" component={Welcome} />
+          {/* private routes are only accessible if a user is logged in  */}
           <PrivateRoute exact path="/training" component={training} />
           <PrivateRoute exact path="/training-add" component={trainingAdd} />
           <PrivateRoute exact path="/learning-profile" component={learningProfile} />
@@ -51,6 +49,7 @@ function App(props) {
           <PrivateRoute path="/logout" component={Logout} />
           <PrivateRoute path="/adduser" component={AddUser} />
           <PrivateRoute path="/personal-profile/add" component={personalProfileAdd} />
+          {/* triggers 404 page if any path other than those speciifed above is entered  */}
           <Route path="*" component={NotFoundPage} />
         </Switch>
       </AuthContext.Provider>
