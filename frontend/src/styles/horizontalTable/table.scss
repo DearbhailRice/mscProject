@@ -1,0 +1,66 @@
+/*table syles*/
+.tableWrapper {
+     margin: 50px 70px 10px 70px;
+     box-shadow: 0px 35px 50px rgba(0,0,0,0.3);
+}
+.table{
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: normal;
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 100%;
+    white-space: nowrap;
+    border: thin solid black;
+    display:inline-block;
+}
+
+.table th,
+.table td{
+    text-align: center;
+    height: auto;
+    padding: 15px 5px;
+    vertical-align: middle;
+    border: thin solid black;   
+}
+
+.thead{
+    // color: rgba(14, 13, 13, 0.432);
+    border-bottom: thin solid rgb(225, 231, 236);
+   
+}
+// .tbody{
+//     float: right;
+    
+// }
+
+
+.thead th{
+    display: block;
+}
+
+// .table{
+//     display: block;
+//     width: 100%;
+// }
+
+// .tableWrapper:before{
+// display: block;
+// text-align: right;
+// font-size: 11px;
+// padding: 0 0 10px;
+// width: 100%;
+// }
+
+// .table th,
+// .table td{
+//     width: 100%;
+//     padding: 20px 0.625em 0.625em 0.625em;
+//     height: 60px;
+//     vertical-align: middle;
+//     box-sizing: border-box;
+//     overflow-x: hidden;
+//     overflow-y: auto;
+//     font-size: 13px;
+// }
+

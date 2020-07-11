@@ -1,0 +1,33 @@
+table.tableWrapper{
+  width: 90%;
+    padding: 5%;
+    display: inline-flex;
+    margin: 2px ;
+}
+
+.titleElement{
+    justify-content: left;
+    text-align: left;
+}
+
+.dataElement{
+    justify-content: left;
+    margin-left: 20px;
+}
+.tableTitle{
+    text-align: left;
+    width: 90%;
+    text-decoration: underline;
+}
+.h1{
+    width: auto;
+}
+
+
+// .editIcon{
+//     float: right;
+// }
+
+table{
+    width: 100%;
+}

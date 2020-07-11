@@ -1,0 +1,30 @@
+
+fieldset{
+    width: 100%;
+    display: inline-flex;
+    border: none;
+}
+
+.formElement{
+    width:90%;
+    margin: 3%;
+}
+
+.formInput{
+    display: inline-flex;
+    width:50%;
+    margin-left: 10px;
+}
+.formLabel{
+    display: inline-flex;
+    width:100%;
+}
+.formElement .formButton{
+float: right;
+margin-right: 5%;
+margin-bottom: 5%;
+}
+
+.title{
+    text-decoration: underline;
+}

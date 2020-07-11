@@ -1,0 +1,31 @@
+
+
+.learningInfo{
+    width: 90%;
+    max-width: 90%;
+    padding: 2%;
+    display: flex;
+    margin: 5% ;
+    box-shadow: 0px 35px 50px rgba(0,0,0,0.3);
+    }
+    .captionDiv{
+        width:100%;
+    }
+    .learningTable{
+        width:80%;
+        max-width: 80%;
+    }
+    .titlePersonalProfile{
+        margin: 50px 70px 10px 70px;
+        display: inline;
+   }
+   .wrapperDiv{
+       width:100%;
+   }
+   h2.tableTitle{
+       float:left;
+   }
+   a.editButton{
+   float: right;
+   
+   }
