@@ -126,47 +126,64 @@ export default class AddUser extends Component {
     }
 
     handleSubmit() {
+        debugger
         console.log("Handle submit ", this.state.profileData);
         let addRes = {};
         var userId = this.state.userId;
         var data = this.state.profileData;
-        const requestOptions =
-        {
-            method: 'POST',
-            url: 'http://localhost:3001/personal-profile-add',
-            body:
-                JSON.stringify({
-                    userId,
-                    data
-                }),
-            headers: {
 
-                'Content-Type': 'application/json',
-            },
-        }
+        if ((data["Name"] == "") ||
+            (data["Tel. Number"] == "") ||
+            (data["Personal Email"] == "") ||
+            (data["Address Line 1"] == "") ||
+            (data["Postcode"] == "") ||
+            (data["Town"] == "") ||
+            (data["County"] == "") ||
+            (data["Emergency Contact Name"] == "") ||
+            (data["Emergency Contact Tel. Number"] == "") ||
+            (data["Emergency Contact Relationship"] == "") ||
+            (data["Clinical Area"] == "") ||
+            (data["Role"] == "")) {
+            console.log("in data not blank if ")
+            addRes = {
+                message: "please complete all feilds  "
+            }
+            this.setState({ IsError: true })
+            alert(addRes.message);
+        } else {
+            const requestOptions =
+            {
+                method: 'POST',
+                url: 'http://localhost:3001/personal-profile-add',
+                body:
+                    JSON.stringify({
+                        userId,
+                        data
+                    }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
 
-        fetch('http://localhost:3001/personal-profile-add',
-            requestOptions)
-            .then(res => res.json())
-            .then(data => {
-                console.log("/personal-profile-add " + JSON.stringify(data))
-
-                addRes = {
-                    message: data.message,
-                    user_id: data.user_id,
-                    sucessfulAdd: data.sucessfulAdd
-                }
-                return addRes;
-            }).catch(e => {
-                this.setState({ IsError: true })
-            });
-        setTimeout(() => {
+            fetch('http://localhost:3001/personal-profile-add',
+                requestOptions)
+                .then(res => res.json())
+                .then(data => {
+                    console.log("/personal-profile-add " + JSON.stringify(data))
+                    addRes = {
+                        message: data.message,
+                        user_id: data.user_id,
+                        sucessfulAdd: data.sucessfulAdd
+                    }
+                    return addRes;
+                }).catch(e => {
+                    this.setState({ IsError: true })
+                });
             alert(JSON.stringify(addRes, null, 2));
-            console.log(" editRes.sucessfulEdit", addRes.sucessfulEdit)
             if (addRes.sucessfulEdit) {
                 window.location.href = "/personal-profile"
             }
-        }, 400)
+        }
     }
 
     render() {

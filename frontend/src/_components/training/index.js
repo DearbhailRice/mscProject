@@ -8,7 +8,7 @@ export default class Training extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            columnHearder: ["Id", "Training Title", "Valid for (years)", "Face to face Course", "Mandatory", "Version Number", "Duration", "Add"],
+            columnHeader: [],
             rowData: [[]],
             redirectURL: "/",
             exceptionStatus: 0,
@@ -24,7 +24,20 @@ export default class Training extends Component {
         var trainingId = 0;
         const userId = JSON.parse(localStorage.getItem('tokens'))['user_id'];
         var addButtonShown = "";
+        let columnHearder = [];
+        let removeButton = "";
 
+
+        { (!JSON.parse(localStorage.getItem('tokens'))['isAdmin']) ? removeButton = "" : removeButton = "removeButton"; }
+
+
+        {
+            (!JSON.parse(localStorage.getItem('tokens'))['isAdmin']) ?
+                columnHearder = ["Id", "Training Title", "Valid for (years)", "Face to face Course", "Mandatory", "Version Number", "Duration", "Add"] :
+                columnHearder = ["Id", "Training Title", "Valid for (years)", "Face to face Course", "Mandatory", "Version Number", "Duration", "Add", "Remove"]
+
+        }
+        this.setState({ columnHearder: columnHearder })
         fetch("http://localhost:3001/training_disable" + userId)
             .then(res => {
                 console.log(res.status);
@@ -78,7 +91,8 @@ export default class Training extends Component {
                                 item.training_mandatory,
                                 item.training_version_number,
                                 item.training_duration,
-                                addButtonShown
+                                addButtonShown,
+                                removeButton
                             ];
                         });
                         console.log("table array" + JSON.stringify(tableArray, null, 4));
@@ -113,7 +127,7 @@ export default class Training extends Component {
                                 </a> : null}
                         </div>
                         <div className="learningTable">
-                            <Table {...this.state} addTraining={this.addTraining.bind(this)} className="learningTable" />
+                            <Table {...this.state} addTraining={this.addTraining.bind(this)} removeTraining={this.removeTrainingRecord.bind(this)} className="learningTable" />
                         </div>
                     </div>
                 </div>
@@ -162,4 +176,55 @@ export default class Training extends Component {
         }, 400)
         window.location.reload(true);
     }
+
+    /**
+        * sends delete request to the api to remove training record fron the users learning profile 
+        * @param {*} trainingId 
+        */
+    removeTrainingRecord(trainingId) {
+        console.log("Remove training Record" + trainingId);
+        let deleteRes = {};
+        var data = this.state.profileData;
+        const requestOptions =
+        {
+            method: 'DELETE',
+            url: 'http://localhost:3001/training-delete',
+            body:
+                JSON.stringify({
+                    trainingId,
+                    data
+                }),
+            headers: {
+
+                'Content-Type': 'application/json',
+            },
+        }
+        fetch('http://localhost:3001/training-delete',
+            requestOptions)
+            .then(res => {
+                console.log(res.status);
+                if (res.status === 200) { return res.json(); }
+
+                throw `Invalid Query`
+            })
+            .then(data => {
+                console.log("/learning-profile-delete " + JSON.stringify(data))
+
+                deleteRes = {
+                    message: data.message,
+                }
+                console.log("addRes ", deleteRes)
+                return deleteRes;
+
+            }).catch(e => {
+                this.setState({ IsError: true })
+            });
+
+        setTimeout(() => {
+            alert(JSON.stringify(deleteRes, null, 2));
+
+        }, 400)
+        window.location.reload(true);
+    }
+
 }

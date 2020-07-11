@@ -146,7 +146,6 @@ app.route("/login_push").post(function (req, res) {
       console.log("results ", results)
       if (results < 1) {
         console.log("results<1")
-        user_id = results[0].user_id;
         console.log("results < 1 " + results)
         message = "email " + user_email + " or password are incorrect";
       }
@@ -155,6 +154,7 @@ app.route("/login_push").post(function (req, res) {
         throw error;
       }
       else {
+        user_id = results[0].user_id;
         console.log("db results " + JSON.stringify(results))
         console.log(" results.user_email_address " + results[0].user_email_address)
         console.log("userID ", results[0].user_id)
@@ -258,7 +258,7 @@ app.route("/add-user").post(function (req, res) {
           }
 
           connection.query(
-            `INSERT INTO msc_project.user (user_id, user_name, user_email_address, user_start_date, user_bank_staff_number, user_current_trust_employee_in_current_role, user_role_id_fk,user_admin) VALUES (NULL, ${name}, ${workEmail} ,${startDate} , ${staffNumber}, ${curentTrustEmployee},${roleId}, ${userAdmin});`,
+            `INSERT INTO msc_project.user (user_id, user_name, user_email_address, user_start_date, user_bank_staff_number, user_current_trust_employee_in_current_role, user_role_id_fk,user_admin) VALUES (NULL, "${name}", "${workEmail}" ,"${startDate}" , ${staffNumber}, ${curentTrustEmployee},${roleId}, ${userAdmin});`,
 
             function (error, results, feilds) {
               if (error) {
@@ -880,6 +880,33 @@ app.route("/learning-profile-delete").delete(function (req, res) {
 
     });
 });
+
+app.route("/training-delete").delete(function (req, res) {
+
+  console.log("In learning-profile-delete")
+
+  const payload = req.body;
+  console.log("payload data ", payload.data)
+  console.log("payload.userId " + payload.userId)
+  var message = "";
+  var trainingId = payload.trainingId;
+
+  connection.query(`DELETE FROM msc_project.training  WHERE training_id=${trainingId}`
+    , function (error, results) {
+      if (error) throw error;
+
+      message = "Learning Profile training record Deleted "
+
+      const responseObj = {
+        message: message,
+      }
+      console.log(JSON.stringify(responseObj));
+      return res.json(responseObj)
+
+    });
+});
+
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
