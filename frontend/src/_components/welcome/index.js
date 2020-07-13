@@ -25,10 +25,13 @@ export default class AddUser extends Component {
                             <div className="welcomeText">
                                 <p> Welcome to the Northern Health and Social Care Trusts Statutory and Mandatory training tracker for bank nursing staff
                                 This resource is intended to help Nursing staff track their Statutory and Mandatory training to aid the completion and recording of individulas CPD.
+                                Please login into view your profile
                             </p>
                                 <p>Bank Office Contact </p>
-                                <p>phone number: 028908762462</p>
-                                <p> email: bankOffice@northerntrust.hscni.net</p>
+                                <p>phone number:<a href="tel:028908762462">028908762462</a> </p>
+
+                                <p>email: <a href="mailto: nhsct.elearm@gmail.com">
+                                    nhsct.elearm@gmail.com</a></p>
                             </div>
                         </div>
                     </div>

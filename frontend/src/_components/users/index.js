@@ -58,6 +58,11 @@ export default class learningProfile extends Component {
      * fetches learning profile data from the api using the user id
      */
     componentWillMount() {
+        if (!localStorage.tokens) {
+            window.location.href = "/login"
+        } else if (!JSON.parse(localStorage.getItem('tokens'))['isAdmin']) {
+            window.location.href = "/notfound"
+        }
         let tableArray = [];
         let viewButton = "viewButton";
 
