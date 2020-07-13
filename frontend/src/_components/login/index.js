@@ -21,8 +21,6 @@ function Login(props) {
     const handleSubmit = (values, { setSubmitting }) => {
         const user_email = values.email;
         const user_password = values.password;
-        console.log("user_email frontend " + user_email);
-        console.log("user_password frontend " + user_password);
 
         const requestOptions =
         {

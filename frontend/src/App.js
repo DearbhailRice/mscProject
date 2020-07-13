@@ -16,6 +16,7 @@ import trainingAdd from "./_components/training/add";
 import learningProfileEdit from "./_components/learning-profile/edit";
 import Welcome from "./_components/welcome";
 import NotFoundPage from "./_components/NotFoundPage";
+import Users from "./_components/users";
 
 function App(props) {
   const existingTokens = JSON.parse(localStorage.getItem("tokens"));
@@ -48,6 +49,7 @@ function App(props) {
           <PrivateRoute exact path="/personal-profile/edit" component={personalProfileEdit} />
           <PrivateRoute path="/logout" component={Logout} />
           <PrivateRoute path="/adduser" component={AddUser} />
+          <PrivateRoute path="/view-users" component={Users} />
           <PrivateRoute path="/personal-profile/add" component={personalProfileAdd} />
           {/* triggers 404 page if any path other than those speciifed above is entered  */}
           <Route path="*" component={NotFoundPage} />

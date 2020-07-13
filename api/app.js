@@ -16,7 +16,7 @@ const nodemailer = require("nodemailer");
 var multer = require('multer')
 var upload = multer({ dest: 'uploads/' })
 const key = "mscProject";
-const AES = require('mysql-aes');
+
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -29,14 +29,13 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage })
 
-// view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: false }, { limit: '50mb' }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -51,7 +50,7 @@ app.route("/learning-profile-select:userId").get(function (req, res) {
   console.log("in  router api");
   connection.query(
     "SELECT * FROM learning_profile INNER JOIN training on learning_profile.learning_profile_training_id= training.training_id INNER JOIN user on learning_profile_user_id = user.user_id	 WHERE learning_profile.learning_profile_user_id= ? ; ",
-    req.params.userId,
+    [req.params.userId],
     function (error, results) {
       if (error) throw error;
       res.json(results);
@@ -63,7 +62,7 @@ app.route("/personal_profile_select:userId").get(function (req, res) {
   console.log("in personal_profile_select router api");
   connection.query(
     "SELECT user_id, user_name, user_email_address,user_start_date, user_bank_staff_number,user_current_trust_employee_in_current_role,contact_details_tel_number, contact_details_personal_email,  contact_details_preffer_personal_email_contact, address_line_1, address_line_2, address_line_3,  address_postcode,address_town, address_county, emergency_contact_details_name, emergency_contact_details_tel_number, emergency_contact_details__relationship,clinical_area_title,role_title,role_band_id FROM user INNER Join contact_details on user.user_id = contact_details.contact_details_user_id INNER JOIN address on user.user_id=address.address_user_id INNER Join emergency_contact_details on user.user_id =emergency_contact_details.emergency_contact_details_user_id INNER JOIN clinical_area_to_user_lookup on user.user_id = user.user_id INNER Join clinical_area on clinical_area_to_user_lookup.clinical_area_to_user_lookup_clinical_area_id = clinical_area.clinical_area_id INNER JOIN role on user.user_role_id_fk= role.role_id INNER JOIN band on role.role_band_id= band.band_id WHERE user.user_id = ? ; ",
-    req.params.userId,
+    [req.params.userId],
     function (error, results, feilds) {
       console.log(results)
       if (error) throw error;
@@ -104,8 +103,7 @@ app.route("/login_select:user_email").get(function (req, res) {
   console.log("user_email " + req.params.user_email)
   connection.query(
     ` SELECT user_id, user_admin, user_email_address, AES_DECRYPT(password_text,"mscProject" ) FROM user INNER Join password on user_id= password_user_id where user_email_address = ?;`,
-    // `SELECT user_id, user_email_address, AES_DECRYPT(password_text,${JSON.stringify(key)}) FROM user INNER Join password on user_id= password_user_id where user_email_address = ?;`,
-    req.params.user_email,
+    [req.params.user_email],
     function (error, results, feilds) {
       console.log("Error " + error)
       if (error) throw error;
@@ -160,14 +158,7 @@ app.route("/login_push").post(function (req, res) {
         console.log("userID ", results[0].user_id)
         message = "email and password match";
         isCorrectLogin = true;
-        // if ((user_email == results[0].user_email_address) && (user_password == results[0].password_text)) {
-        //   message = "email and password match";
-        //   isCorrectLogin = true;
-        // }
-        // else {
-        //   message = "username and password do not match";
 
-        // }
         console.log("results[0].user_admin" + results[0].user_admin)
         if (results[0].user_admin === 1) {
           user_admin = true;
@@ -219,7 +210,7 @@ app.route("/add-user").post(function (req, res) {
   var message = "";
 
   var responseObj = {};
-  connection.query(" select role_id from role where role_band_id = " + band + " AND  role_title= " + JSON.stringify(role) + ";"
+  connection.query(`select role_id from role where role_band_id =  ${band}  AND  role_title= "${role}" ;`
     , function (error, roleresults, feilds) {
       if (error) {
         console.log("Error " + error)
@@ -236,7 +227,7 @@ app.route("/add-user").post(function (req, res) {
 
       connection.query(
         "SELECT user_id, user_email_address FROM `user` where user_email_address =  ?;",
-        workEmail,
+        [workEmail],
         function (error, results, feilds) {
           console.log("Error " + error)
           if (results.length > 0) {
@@ -255,94 +246,92 @@ app.route("/add-user").post(function (req, res) {
           else if (error) {
             console.log("Error " + error)
             throw error;
-          }
+          } else {
 
-          connection.query(
-            `INSERT INTO msc_project.user (user_id, user_name, user_email_address, user_start_date, user_bank_staff_number, user_current_trust_employee_in_current_role, user_role_id_fk,user_admin) VALUES (NULL, "
+            connection.query(
+              `INSERT INTO msc_project.user (user_id, user_name, user_email_address, user_start_date, user_bank_staff_number, user_current_trust_employee_in_current_role, user_role_id_fk,user_admin) VALUES (NULL, "
             ${name}", "${workEmail}" ,"${startDate}" , ${staffNumber}, ${curentTrustEmployee},${roleId}, ${userAdmin});`,
 
-            function (error, results, feilds) {
-              if (error) {
-                console.log("Error " + error)
-                throw error;
-              }
-              connection.query(
-                "SELECT user_id FROM `user` where user_email_address =  ?;",
-                workEmail,
-                function (error, results, feilds) {
+              function (error, results, feilds) {
+                if (error) {
                   console.log("Error " + error)
-
-                  if (results < 1) {
-                    console.log("results < 1 " + results)
-                    message = "email " + workEmail + "does not match an existing user";
-
-                  }
-                  else if (error) {
+                  throw error;
+                }
+                connection.query(
+                  "SELECT user_id FROM `user` where user_email_address =  ?;",
+                  [workEmail],
+                  function (error, results, feilds) {
                     console.log("Error " + error)
-                    throw error;
-                  }
-                  else {
-                    console.log(results)
-                    console.log("db results " + JSON.stringify(results))
-                    console.log(" results.user_email_address " + results[0].user_email_address)
+
+                    if (results < 1) {
+                      console.log("results < 1 " + results)
+                      message = "email " + workEmail + "does not match an existing user";
+
+                    }
+                    else if (error) {
+                      console.log("Error " + error)
+                      throw error;
+                    }
+                    else {
+                      console.log(results)
+                      console.log("db results " + JSON.stringify(results))
+                      console.log(" results.user_email_address " + results[0].user_email_address)
 
 
 
-                    const token = Crypto.randomBytes(20).toString("hex");
-                    const userId = results[0].user_id;
+                      const token = Crypto.randomBytes(20).toString("hex");
+                      const userId = results[0].user_id;
 
-                    console.log("useid " + userId)
+                      console.log("useid " + userId)
 
-                    const transporter = nodemailer.createTransport({
-                      service: 'gmail',
-                      auth: {
-                        user: 'nhsct.elearm@gmail.com',
-                        pass: 'mscPassword'
+                      const transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                          user: 'nhsct.elearm@gmail.com',
+                          pass: 'mscPassword'
+                        }
+                      })
+
+                      const mailOptions = {
+                        from: "nhsct.e-learm@gmail.com",
+                        to: workEmail,
+                        subject: "password set request for Northern HSCT e-learning platform  ",
+                        text:
+                          "an account has been created for you, please follow the link bellow to create a password for you account \n\n" +
+                          "http://localhost:3000/reset/" + token + "/" + userId + "\n\n" +
+                          "Please complete your porfile at your earliest convience  "
+                      };
+
+                      transporter.sendMail(mailOptions, function (err, response) {
+                        if (err) {
+                          console.log("mail error: ", err);
+                        } else {
+                          console.log("mail response ", response);
+                          res.status(200).json("recovery email sent ")
+                        }
+                      })
+
+                      user_id = results[0].user_id;
+                      message = "email address found, reset email sent";
+                      resetEmailSent = true;
+
+
+                      responseObj = {
+                        user_id: user_id,
+                        message: message,
+                        resetEmailSent: resetEmailSent
                       }
-                    })
-
-                    const mailOptions = {
-                      from: "nhsct.e-learm@gmail.com",
-                      to: workEmail,
-                      subject: "password reset request for Northern HSCT e-learning platform  ",
-                      text:
-                        "an account has been created for you, please follow the link bellow to create a password for you account \n\n" +
-                        "http://localhost:3000/reset/" + token + "/" + userId + "\n\n" +
-                        "Please complete your porfile at your earliest convience  "
+                      console.log(JSON.stringify(responseObj));
+                      return responseObj
                     };
 
-                    transporter.sendMail(mailOptions, function (err, response) {
-                      if (err) {
-                        console.log("mail error: ", err);
-                      } else {
-                        console.log("mail response ", response);
-                        res.status(200).json("recovery email sent ")
-                      }
-                    })
-
-                    user_id = results[0].user_id;
-                    message = "email address found, reset email sent";
-                    resetEmailSent = true;
-
-
-                    responseObj = {
-                      user_id: user_id,
-                      message: message,
-                      resetEmailSent: resetEmailSent
-                    }
-                    console.log(JSON.stringify(responseObj));
-                    return responseObj
-                  };
-
-                });
-            });
-
+                  });
+              });
+          }
         });
 
     });
-  if (responseObj != -{}) {
-    res.json(responseObj)
-  }
+  res.json(responseObj)
 });
 
 
@@ -366,7 +355,7 @@ app.route("/forgottenPassword_push").post(function (req, res) {
 
   connection.query(
     "SELECT user_id, user_email_address FROM `user` where user_email_address =  ?;",
-    user_email,
+    [user_email],
     function (error, results, feilds) {
       console.log("Error " + error)
 
@@ -405,7 +394,7 @@ app.route("/forgottenPassword_push").post(function (req, res) {
             text:
               "a password reset request has been made for this email if this was you please click the following link: \n\n" +
               "http://localhost:3000/reset/" + token + "/" + userId + "\n\n" +
-              "if this reset was not you pklease ignore this email "
+              "if this reset was not you please ignore this email "
           };
 
           transporter.sendMail(mailOptions, function (err, response) {
@@ -474,18 +463,18 @@ app.route("/personal-profile-edit").post(function (req, res) {
 
   var message = "";
   var sucessfulEdit = false;
-
-  connection.query(" select role_id from role where role_band_id = " + band + " AND  role_title= " + JSON.stringify(role) + ";"
+  console.log(`select role_id from role where role_band_id =  ${band} AND  role_title= "${role}";`)
+  connection.query(`select role_id from role where role_band_id =  ${band} AND  role_title= "${role}";`
     , function (error, roleresults, feilds) {
       if (error) {
         console.log("Error " + error)
         message = "Error update unsucessful " + error;
 
       }
+      console.log(roleresults)
       let roleId = roleresults[0].role_id;
 
-
-      connection.query("select clinical_area_id from clinical_area where clinical_area_title = " + JSON.stringify(clinicalArea) + ";"
+      connection.query(`select clinical_area_id from clinical_area where clinical_area_title = "${clinicalArea}";`
         , function (error, caresults, feilds) {
           if (error) {
             console.log("Error " + error)
@@ -564,7 +553,7 @@ app.route("/personal-profile-add").post(async function (req, res) {
   var message = "";
   var sucessfulAdd = false;
 
-  connection.query(" select role_id from role where role_band_id = " + band + " AND  role_title= " + JSON.stringify(role) + ";"
+  connection.query(`select role_id from role where role_band_id = ${band} AND  role_title= "${role}";`
     , function (error, roleresults, feilds) {
       if (error) {
         console.log("Error " + error)
@@ -574,7 +563,7 @@ app.route("/personal-profile-add").post(async function (req, res) {
       let roleId = roleresults[0].role_id;
 
       console.log("ROLE ID ", roleId)
-      connection.query("select clinical_area_id from clinical_area where clinical_area_title = " + JSON.stringify(clinicalArea) + ";"
+      connection.query(`select clinical_area_id from clinical_area where clinical_area_title = "${clinicalArea}";`
         , function (error, caresults, feilds) {
           if (error) {
             console.log("Error " + error)
@@ -621,7 +610,6 @@ app.route("/personal-profile-add").post(async function (req, res) {
 
             , function (error, results, feilds) {
               if (error) {
-                // connection.query("ROLLBACK")
                 console.log("Error " + error)
                 message = "Error update unsucessful " + error;
               } else {
@@ -653,16 +641,13 @@ app.route("/reset_password_push").post(function (req, res) {
 
   connection.query(`SELECT *, AES_Decrypt(password_text,"${key}" ) FROM password WHERE password.password_user_id =  ${userId};`
     , function (error, results, feilds) {
-      // console.log(results.length + " results ")
       if (error) {
         console.log("Error " + error)
         message = error;
       } else if (results.length === 0) {
         console.log("No user in password table ")
-        //Insert INTO password (password_text,password_user_id) VALUES (AES_ENCRYPT("password", "mscProject"), 1)
-        //Insert INTO password (password_text,password_user_id) VALUES ("${password}", "${key}"), ${userId})
+
         connection.query(`Insert INTO password (password_text,password_user_id) VALUES (AES_ENCRYPT("${password}", "${key}"), ${userId});`
-          // `INSERT INTO msc_project.password (password_id, password_user_id, password_text, password_previous_text, password_date) VALUES (NULL, ${userId} , AES_ENCRYPT("${password}", "${key}") , NULL, NULL);`
           , function (error, caresults, feilds) {
             if (error) {
               console.log("Error " + error)
@@ -718,7 +703,7 @@ app.route("/training-select").get(function (req, res) {
 app.route("/training_disable:userId").get(function (req, res) {
   connection.query(
     "SELECT learning_profile_training_id FROM learning_profile INNER JOIN training on learning_profile_training_id = training.training_id INNER JOIN user on learning_profile_user_id = user.user_id WHERE user_id= ?; ",
-    req.params.userId,
+    [req.params.userId],
     function (error, results) {
       if (error) { throw error }
       else if (results.length > 0) {
@@ -754,20 +739,8 @@ app.route("/learning_profile_add").post(function (req, res) {
     });
 });
 
-app.post('/uploadfile', upload.single('uploadFile'), (req, res, next) => {
-  const file = req.file
-  if (!file) {
-    const error = new Error('Please upload a file')
-    error.httpStatusCode = 400
-    return next(error)
-  }
-  res.send(file)
 
-})
-
-
-
-app.post('/learning_profile_edit', upload.single('Certificate Upload'), (req, res) => {
+app.route('/learning_profile_edit').post(upload.single('Certificate Upload'), async (req, res) => {
 
   const payload = req.body;
   var userId = payload.userId;
@@ -778,27 +751,26 @@ app.post('/learning_profile_edit', upload.single('Certificate Upload'), (req, re
   let message = "";
   let sucessfulEdit = false;
 
-
-
   console.log(`UPDATE msc_project.learning_profile SET learning_profile_certificate_path='${fileName}',learning_profile_date_completed=' ${trainingDateComplete}' WHERE learning_profile.learning_profile_training_id= ${trainingId} AND learning_profile.learning_profile_user_id= ${userId}`)
   connection.query(`UPDATE msc_project.learning_profile SET learning_profile_certificate_path='${fileName}',learning_profile_date_completed= STR_TO_DATE('${trainingDateComplete}', '%Y-%m-%d') WHERE learning_profile.learning_profile_training_id= ${trainingId} AND learning_profile.learning_profile_user_id= ${userId};`
-    , function (error, results) {
+    , function (error, results, feilds) {
       if (error) {
-        message = "error occured  "
-        sucessfulEdit = false;
-        throw error
-      };
-      message = "Added "
-      sucessfulEdit = true;
-
+        console.log("Error " + error)
+        message = "Error update unsucessful " + error;
+      } else {
+        message = "update sucessful"
+        sucessfulEdit = true;
+      }
       const responseObj = {
+        userId: userId,
         message: message,
         sucessfulEdit: sucessfulEdit
       }
-      console.log("response obj ", responseObj)
-      return res.json(responseObj)
-    })
-})
+      console.log(JSON.stringify(responseObj));
+
+      return res.json(responseObj);
+    });
+});
 
 app.route("/training-add").post(async function (req, res) {
 
@@ -815,9 +787,7 @@ app.route("/training-add").post(async function (req, res) {
   var trainingManditory = (payload.data["Mandatory"] == "Yes") ? 1 : 0;
   var trainingDuration = payload.data["Duration"];
   var trainingDate = payload.data["Training Version Release Date"];
-  //strip slashes 
-  //sql injection 
-  //string interpulation 
+
   console.log("api push ", userId)
 
   connection.query(
@@ -828,27 +798,25 @@ app.route("/training-add").post(async function (req, res) {
       if (error) throw error;
 
       if (results.length > 0) {
-        const responseObj = {
-          userId: userId,
-          message: "Traing with the same Name and version number exists in database ",
-          sucessfulAdd: false
-        }
-        return res.json(responseObj)
+
+        userId = userId,
+          message = "Traing with the same Name and version number exists in database ",
+          sucessfulAdd = false
       }
 
       connection.query(`INSERT INTO msc_project.training (training_id, training_title, training_revalidation_period_years,training_course_face_to_face, training_mandatory, training_version_number, training_version_release_date, training_duration) VALUES (NULL,  '${trainingTitle}' ,${trainingRevalNum}, ${trainingf2f}, ${trainingManditory}, ${trainingVersionNum}, ${trainingDate},'${trainingDuration}');`
 
         , function (error, results) {
           if (error) throw error;
+          message = "something went wrong ",
+            sucessfulAdd = false
 
-          message = "Training sucessfully added ",
-            sucessfulAdd = true
         })
-
+      message = "Training sucessfully added ",
+        sucessfulAdd = true
 
 
       const responseObj = {
-
         message: message,
         sucessfulAdd: sucessfulAdd
       }
@@ -909,6 +877,16 @@ app.route("/training-delete").delete(function (req, res) {
 });
 
 
+app.route("/standard_user_select").get(function (req, res) {
+  console.log("in  router api")
+  connection.query(
+    "SELECT * FROM `user` where user_admin= 0 ",
+    function (error, results) {
+      if (error) throw error;
+      res.json(results);
+    }
+  );
+});
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

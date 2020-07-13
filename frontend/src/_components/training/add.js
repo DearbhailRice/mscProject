@@ -104,36 +104,42 @@ export default class AddUser extends Component {
                         userId,
                         data
                     }),
+
                 headers: {
+
                     'Content-Type': 'application/json',
                 },
             }
 
+
             fetch('http://localhost:3001/training-add',
                 requestOptions)
-                .then(res => {
-                    console.log(res.status);
-                    if (res.status === 200) { return res.json(); }
-                    throw `Invalid Query`
-                })
-                .then(data => {
-                    console.log("/add-user " + JSON.stringify(data))
+                .then(res => res.json())
+                .then(item => {
+                    console.log("/training-add " + JSON.stringify(item))
+
                     addRes = {
-                        message: data.message,
+                        message: item.message,
+                        sucessfulAdd: item.sucessfulAdd
                     }
-                    console.log("addRes ", addRes)
                     return addRes;
                 }).catch(e => {
                     this.setState({ IsError: true })
-                });
-        }
-        setTimeout(() => {
-            alert(JSON.stringify(addRes, null, 2));
-        }, 400)
-        if (addRes.sucessfulEdit) {
-            window.location.href = "/add-profile-info"
+                })
+            setTimeout(() => {
+                alert(JSON.stringify(addRes, null, 2));
+                console.log(" editRes.sucessfulEdit", addRes.sucessfulAdd)
+                if (addRes.sucessfulAdd) {
+                    window.location.href = "/training"
+                }
+            }, 400)
         }
     }
+
+
+
+
+
     render() {
         return (
             <div className="personalProfile" >

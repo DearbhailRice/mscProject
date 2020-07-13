@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import Navbar from "../../_components/navbar";
-import Table from "../../_components/table";
+import Navbar from "../navbar";
+import Table from "../table";
 import "../../styles/learningProfile/learningProfile.scss";
 import moment from "moment"
 
@@ -54,10 +54,28 @@ export default class learningProfile extends Component {
      * fetches learning profile data from the api using the user id
      */
     componentWillMount() {
-        let tableArray = [];
-        const userId = JSON.parse(localStorage.getItem('tokens'))['user_id'];
+        debugger
+        let userId = 0;
         let editButton = "editButton";
         let removeButton = "removeButton";
+        if (JSON.parse(localStorage.getItem('tokens'))['isAdmin']) {
+            if (!this.props.history.location.isAdminView) {
+                userId = JSON.parse(localStorage.getItem('tokens'))['user_id'];
+
+            } else {
+                userId = this.props.history.location.userId
+                editButton = "disable";
+                removeButton = "disabled";
+                this.setState({ componentTitle: "learning Profile: " + this.props.history.location.userName })
+                console.log("View isuserId", userId)
+            }
+        } else {
+            userId = JSON.parse(localStorage.getItem('tokens'))['user_id'];
+        }
+        let tableArray = [];
+
+
+
         const VALID = "Valid"
         const INVALID = "Invalid"
         let isValid = VALID;

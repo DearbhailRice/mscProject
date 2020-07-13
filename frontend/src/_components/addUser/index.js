@@ -8,7 +8,7 @@ export default class AddUser extends Component {
         super(props);
 
         this.state = {
-            userId: 1,
+
             options: [[]],
             profileData: {
                 "Name": "",
@@ -25,7 +25,8 @@ export default class AddUser extends Component {
             validateError: "",
             isError: false,
             error: "",
-            originUrl: "/personal-profile"
+            originUrl: "/personal-profile",
+            responseData: {}
         }
 
         this.handleDataUpdate = this.handleDataUpdate.bind(this);
@@ -106,31 +107,28 @@ export default class AddUser extends Component {
      * @param {*} ObjToUpdate 
      */
     validate(key, value, ObjToUpdate) {
-        let error = {}
-        let isError = true;
+        let error = "";
+        let isError = false;
         this.setState({ validateError: null });
         console.log("value ", value);
         console.log("key ", key);
         if (!value) {
             error = key + ' Required';
             isError = true;
-            if ((key == "Name") || (key == "Address Line 1") || (key == " ")) {
+            if ((key == "Name")) {
                 if (!/^/.test(ObjToUpdate[key])) {
                 }
-            }
-            if ((key == "Personal Email")) {
+            } else {
+                isError = false;
 
-                console.log("personal email changed ");
-                if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value)) {
-                    error = key + ' Invalid';
-                    isError = true;
-                }
             }
-            this.setState({
-                error: error,
-                isError: isError
-            })
+            console.log(isError, " ", error)
+
         }
+        this.setState({
+            validateError: error,
+            isError: isError
+        })
         console.log("error ", error)
     }
 
@@ -154,9 +152,9 @@ export default class AddUser extends Component {
     /**
      * submits validated data entered in the form component to the api 
      */
-    handleSubmit() {
+    async handleSubmit() {
         console.log("Handle submit ", this.state.profileData);
-
+        debugger
         let addRes = {};
         var userId = this.state.userId;
         var data = this.state.profileData;
@@ -193,9 +191,8 @@ export default class AddUser extends Component {
                 },
             }
             //submitts form data to the api 
-            fetch('http://localhost:3001/add-user',
-                requestOptions)
-                .then(res => {
+            addRes = fetch('http://localhost:3001/add-user',
+                requestOptions).then(res => {
                     console.log(res.status);
                     if (res.status === 200) { return res.json(); }
 
@@ -217,18 +214,13 @@ export default class AddUser extends Component {
                     this.setState({
                         isError: true
                     })
-
                     alert(err + " " + addRes.message);
-                })
-            setTimeout(() => {
-                alert(JSON.stringify(addRes, null, 2));
+                });
 
-            }, 400)
         }
 
-        if (addRes.sucessfulEdit) {
-            window.location.href = "/add-profile-info"
-        }
+        alert(JSON.stringify(addRes, null, 2));
+
     }
 
     render() {

@@ -9,9 +9,6 @@ export default class LearningInfoEdit extends Component {
         super(props);
 
         this.state = {
-
-            options: [[]],
-            columnHeader: this.props.columnHeader,
             profileData: {
                 "Completion Date": "",
                 "Certificate Upload": ""
@@ -21,10 +18,9 @@ export default class LearningInfoEdit extends Component {
             data: {},
             validateError: "",
             isError: false,
-            originUrl: "/personal-profile",
             trainingId: props.match.params.trainingId,
             userId: JSON.parse(localStorage.getItem('tokens'))['user_id'],
-            editRes: {}
+
         }
         if (!localStorage.tokens) {
             window.location.href = "/login"
@@ -34,30 +30,7 @@ export default class LearningInfoEdit extends Component {
 
     }
 
-    validate(key, value, ObjToUpdate) {
-        let error = {}
-        this.setState({ validateError: null });
-        console.log("value ", value);
-        console.log("key ", key);
-        if ((key == "Address Line 2") || (key == "Address Line 3")) {
-            console.log("not address1")
 
-        } else if (!value) {
-            error = key + ' Required';
-
-            if ((key == "Personal Email")) {
-
-                console.log("personal email changed ");
-                if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value)) {
-                    error = key + ' Invalid';
-                }
-            }
-            this.setState({
-                validateError: error
-            })
-        }
-        console.log("error ", error)
-    }
 
     handleDataUpdate(key, value, e) {
         console.log("key ", key)
@@ -76,19 +49,25 @@ export default class LearningInfoEdit extends Component {
         console.log(ObjToUpdate, " OBJECT UPDATED")
         ObjToUpdate[key] = value;
 
-        this.validate(key, value, ObjToUpdate)
-
         this.setState({
             profileData: ObjToUpdate
         })
     }
 
+    async editPost(requestOptions) {
+
+        let response = await fetch('http://localhost:3001/learning_profile_edit', requestOptions);
+        let item = await response.json();
+        return item
+    }
+
     handleSubmit() {
         console.log("Handle submit ", this.state.profileData);
-
+        let editRes = {};
         var userId = this.state.userId;
         var trainingId = this.state.trainingId;
         var data = this.state.profileData;
+
         const requestOptions =
         {
             method: 'POST',
@@ -99,9 +78,7 @@ export default class LearningInfoEdit extends Component {
                     trainingId,
                     data
                 }),
-
             headers: {
-
                 'Content-Type': 'application/json',
             },
         }
@@ -109,31 +86,28 @@ export default class LearningInfoEdit extends Component {
         fetch('http://localhost:3001/learning_profile_edit',
             requestOptions)
             .then(res => res.json())
-            .then(data => {
-                console.log("/login push response " + JSON.stringify(data))
+            .then(item => {
+                console.log("/login push response " + JSON.stringify(item))
 
-                let editResObj = {
-                    message: data.message,
-                    sucessfulEdit: data.sucessfulEdit
+                editRes = {
+                    message: item.message,
+                    sucessfulEdit: item.sucessfulEdit
                 }
+                console.log("edit res ", editRes)
 
-                console.log("edit res ", editResObj)
-
-                this.setState({
-                    editRes: editResObj
-                })
-
-                return editResObj;
-            }).catch(e => {
-                console.log("error", e)
+                return editRes;
+            }).catch(err => {
+                console.log("error", err)
                 this.setState({ IsError: true });
-            });
-
+            })
         setTimeout(() => {
+            console.log(" editRes.sucessfulEdit", editRes.sucessfulEdit)
             alert(JSON.stringify(this.editRes, null, 2));
+            if (editRes.sucessfulEdit) {
+                window.location.href = "/learning-profile";
+            }
         }, 400)
 
-        window.location.href = "/learning-profile";
     }
 
     render() {

@@ -72,20 +72,12 @@ export default class PersonalInfoEdit extends Component {
     }
 
     validate(key, value, ObjToUpdate) {
-        let error = {}
+        let error = "";
         let isError = false;
         this.setState({ validateError: null });
         console.log("value ", value);
         console.log("key ", key);
-        if ((key == "Address Line 2") || (key == "Address Line 3")) {
-            console.log("not address1")
-        } else if (!value) {
-            error = key + ' Required';
-            isError = true;
-            if ((key == "Name") || (key == "Address Line 1") || (key == " ")) {
-                if (!/^/.test(ObjToUpdate[key])) {
-                }
-            }
+        if ((key == "Address Line 2") || (key == "Address Line 3") || key == "Personal Email") {
             if ((key == "Personal Email")) {
                 console.log("personal email changed ");
                 if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(value)) {
@@ -93,12 +85,24 @@ export default class PersonalInfoEdit extends Component {
                     isError = true;
                 }
             }
-            this.setState({
-                validateError: error,
-                isError: isError
-            })
-        }
+            console.log("not address1")
+        } else if (!value) {
+            error = key + ' Required';
+            isError = true;
+            if ((key == "Name") || (key == "Address Line 1") || (key == " ")) {
+                if (!/^/.test(ObjToUpdate[key])) {
+                }
+            } else {
+                isError = false;
 
+            }
+            console.log(isError, " ", error)
+
+        }
+        this.setState({
+            validateError: error,
+            isError: isError
+        })
         console.log("error ", error)
     }
 
@@ -148,7 +152,7 @@ export default class PersonalInfoEdit extends Component {
                 return editRes;
             }).catch(e => {
                 this.setState({ IsError: true })
-            });
+            })
         setTimeout(() => {
             alert(JSON.stringify(editRes, null, 2));
             console.log(" editRes.sucessfulEdit", editRes.sucessfulEdit)

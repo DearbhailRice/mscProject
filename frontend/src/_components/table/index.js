@@ -73,6 +73,12 @@ export default class Table extends Component {
                                                 }
                                                 }>Remove</button></td>
                                             }
+                                            else if (cellData == "viewButton") {
+                                                return <td><button onClick={() => {
+                                                    this.props.userLerningProfileview(dataRow[0], dataRow[1]);
+                                                }
+                                                }>View</button></td>
+                                            }
                                             else {
                                                 return <td>{cellData}</td>
                                             }

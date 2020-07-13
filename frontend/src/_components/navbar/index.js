@@ -53,7 +53,7 @@ export default class Navbar extends Component {
 
                             {(!isAdmin) ? <li></li> :
                                 <li>
-                                    <a onClick={() => { window.location.href = "/adduser" }}>
+                                    <a onClick={() => { window.location.href = "/view-users" }}>
                                         <FontAwesomeIcon icon={faUserPlus} size="2x" style={{ color: "darkgray" }} />
                                     </a>
                                 </li>
