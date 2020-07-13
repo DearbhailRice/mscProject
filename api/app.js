@@ -406,9 +406,9 @@ app.route("/forgottenPassword_push").post(function (req, res) {
             }
           })
 
-          user_id = results[0].user_id;
-          message = "email address found, reset email sent";
-          resetEmailSent = true;
+          // user_id = results[0].user_id;
+          // message = "email address found, reset email sent";
+          // resetEmailSent = true;
 
         }
         const responseObj = {
