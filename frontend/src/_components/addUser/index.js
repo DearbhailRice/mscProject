@@ -154,7 +154,7 @@ export default class AddUser extends Component {
      */
     async handleSubmit() {
         console.log("Handle submit ", this.state.profileData);
-        debugger
+
         let addRes = {};
         var userId = this.state.userId;
         var data = this.state.profileData;

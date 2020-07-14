@@ -54,7 +54,6 @@ export default class learningProfile extends Component {
      * fetches learning profile data from the api using the user id
      */
     componentWillMount() {
-        debugger
         let userId = 0;
         let editButton = "editButton";
         let removeButton = "removeButton";
